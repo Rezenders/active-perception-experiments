@@ -1,0 +1,21 @@
+/*
+    uav_ap
+    ---------------------------
+
+    Jason Project File
+
+    This file defines the initial state of the MAS
+
+    Jason 2.5-SNAPSHOT
+    March 17, 2020 - 14:39:59
+*/
+
+MAS uav_ap {
+
+    infrastructure: Centralised
+
+    agents: sample_agent agentArchClass jasonros.RosArch;
+
+    directives: apply_ap = active_perception.ApplyAP;
+    aslSourcePath: "src/asl";
+}
