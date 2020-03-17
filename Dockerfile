@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
 	default-jdk \
 	wget \
 	unzip \
+	ros-melodic-mavros \
 	&& rm -rf /var/lib/apt/lists/
 
 # Set java home
@@ -22,20 +23,23 @@ RUN [ "/bin/bash","-c","source /opt/ros/melodic/setup.bash && \
         cd /jason_ros_ws/src && catkin_init_workspace"]
 
 WORKDIR /jason_ros_ws/src
-RUN ["/bin/bash", "-c", "git clone https://github.com/jason-lang/jason_ros.git"]
+RUN ["/bin/bash", "-c", "git clone https://github.com/jason-lang/jason_ros.git "]
 
 WORKDIR /jason_ros_ws
 RUN [ "/bin/bash","-c","source /opt/ros/melodic/setup.bash && \
-        rosdep update && rosdep install --from-paths src --ignore-src -r -y && catkin_make"]
+        apt-get update && rosdep update && rosdep install --from-paths src --ignore-src -r -y \
+        && catkin_make && rm -rf /var/lib/apt/lists/"]
 
 WORKDIR /
 RUN ["/bin/bash", "-c","git clone https://github.com/Rezenders/jason-active-perception.git"]
+
+COPY actions_manifest /manifests/
+COPY perceptions_manifest /manifests/
 
 COPY uav_ap/ /uav_ap/
 
 RUN ["/bin/bash","-c","cp -r /jason-active-perception/src/java/active_perception/ /uav_ap/src/java/"]
 WORKDIR /uav_ap
-RUN ["/bin/bash","-c","gradle build"]
 
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
