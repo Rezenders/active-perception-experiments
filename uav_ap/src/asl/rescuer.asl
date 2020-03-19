@@ -24,21 +24,26 @@
 
 +?victim(Lat, Long)[ap(T)]
 	<- 	.print("active perception victim");
+			Delta = 0.0001;
+			!goToPos(Lat + Delta, Long + Delta, 50);
+			!goToPos(Lat + Delta, Long - Delta, 50);
+			!goToPos(Lat - Delta, Long - Delta, 50);
+			!goToPos(Lat - Delta, Long + Delta, 50);
 			.time(HH,MM,SS,MS);
 			+victim(Lat, Long)[ap(T),lu(HH,MM,SS,MS)].
 
 
 +!setMode(Mode)
 	<- 	set_mode(Mode);
-		.wait(state(Mode)).
+			.wait(state(Mode)).
 
 +!takeOff(Alt)
 	<-	takeoff(Alt);
-		.wait(altitude(A) & math.abs(A-Alt) <= 0.1).
+			.wait(altitude(A) & math.abs(A-Alt) <= 0.1).
 
 +!goToPos(Lat, Long, Alt)
 	<- 	setpoint(Lat, Long, Alt);
-		.wait(global_pos(X,Y) & math.abs(X -(Lat)) <=0.00001 & math.abs(Y -(Long)) <=0.00001).
+			.wait(global_pos(X,Y) & math.abs(X -(Lat)) <=0.00001 & math.abs(Y -(Long)) <=0.00001).
 
 +!returnToLand
 	<-	set_mode("RTL");
