@@ -4,6 +4,6 @@ MAS uav_ap {
 
     agents: rescuer agentArchClass jasonros.RosArch;
 
-    directives: apply_ap = active_perception.ApplyAP;
+    directives: apply_ap = active_perception.Directive2B;
     aslSourcePath: "src/asl";
 }
