@@ -1,5 +1,3 @@
-// adj(X,Y1,X,Y2) :- Y2 == Y1-1.
-
 !start_rescue.
 
 +!start_rescue
@@ -29,6 +27,7 @@
 			!goToPos(Lat + Delta, Long - Delta, 50);
 			!goToPos(Lat - Delta, Long - Delta, 50);
 			!goToPos(Lat - Delta, Long + Delta, 50);
+			!goToPos(Lat + Delta, Long + Delta, 50);
 			.time(HH,MM,SS,MS);
 			+victim(Lat, Long)[ap(T),lu(HH,MM,SS,MS)].
 
