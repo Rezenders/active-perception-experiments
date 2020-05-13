@@ -1,18 +1,43 @@
 # active-perception-experiments
 Experiments for [active perception](https://github.com/Rezenders/jason-active-perception)
 
-# run bare metal
+# compile
+
+```
+$ mkdir -p ~/jason_ros_ws/src
+$ cd ~/jason_ros_ws
+$ catkin_init_workspace src
+```
+
+Then, you must first download [jason_ros](https://github.com/jason-lang/jason_ros) and [this repo](https://github.com/Rezenders/active-perception-experiments) , use ```catkin_make``` to build it, and source the workspace.
+
+```
+$ cd ~/jason_ros_ws/src
+$ git clone https://github.com/jason-lang/jason_ros.git
+$ git clone https://github.com/Rezenders/active-perception-experiments.git
+$ cd ~/jason_ros_ws
+$ catkin_make
+$ source devel/setup.bash
+```
+
+# run using roslaunch
 
 Terminal 1:
 ```
-$ sim_vehicle.py -v ArduCopter --console --map -L UFSC --out mavros:14551
+$ sim_vehicle.py -v ArduCopter --console --map -L UFSC
 ```
 
-For the terminals that runs ros commands you must first source ros
+Terminal 2:
 ```
-$ source /opt/ros/melodic/setup.bash
+$ roslaunch active-perception-experiments uav_ap.launch
 ```
-Substitute melodic with your ros version
+
+# run one by one
+
+Terminal 1:
+```
+$ sim_vehicle.py -v ArduCopter --console --map -L UFSC
+```
 
 Terminal 2:
 ```
@@ -24,15 +49,7 @@ Terminal 3:
 $ roslaunch mavros apm.launch fcu_url:="udp://:14551@:14555"
 ```
 
-For terminal 4 and 5 you must first download [jason_ros](https://github.com/jason-lang/jason_ros), use ```catkin_make``` to build it, and source the workspace.
 
-```
-$ mkdir -p ~/jason_ros_ws/src
-$ cd ~/jason_ros_ws
-$ catkin_init_workspace src
-$ catkin_make
-$ source devel/setup.bash
-```
 
 Terminal 4:
 ```
@@ -49,11 +66,23 @@ $ gradle
 # using docker
 
 ```
-$ sudo docker build -t uav_ap .
+$ sudo docker network create ros_net
 ```
 
 ```
-$ sudo docker run -it --rm uav_ap
+$ sudo docker build -t ap_experiment .
+```
+
+```
+$ xhost +local:root # for the lazy and reckless
+```
+
+```
+$ sudo docker run -it --rm --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" --name ardupilot --net ros_net rezenders/ardupilot-ubuntu sim_vehicle.py -v ArduCopter --console --map -L UFSC --out mavros:14551
+```
+
+```
+$ sudo docker run -it --rm --net ros_net  --name mavros --env ROS_HOSTNAME=mavros ap_experiment roslaunch active-perception-experiments uav_ap.launch fcu_url:="udp://:14551@ardupilot:14555"
 ```
 
 ```
