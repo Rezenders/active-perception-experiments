@@ -1,0 +1,37 @@
+<launch>
+  <node pkg="boustrophedon_server" type="boustrophedon_planner_server" name="boustrophedon_server"  output="screen" >
+      <param name="repeat_boundary" value="false"/>
+      <param name="outline_clockwise" value="true"/>
+      <param name="skip_outlines" value="false"/>
+      <param name="outline_layer_count" value="0"/>
+      <param name="stripe_separation" value="4.0"/>
+      <param name="intermediary_separation" value="0.0"/>
+      <param name="stripe_angle" value="0.0"/>
+      <param name="enable_stripe_angle_orientation" value="true" />
+      <param name="travel_along_boundary" value="true" />
+      <param name="allow_points_outside_boundary" value="true" />
+      <!-- Note: if enabling half-y turns, must have an outline_layer_count >= 1 -->
+      <param name="enable_half_y_turns" value="false" />
+      <param name="points_per_turn" value="15" />
+      <param name="turn_start_offset" value="0.5" />
+      <param name="publish_polygons" value="true"/>
+      <param name="publish_path_points" value="true"/>
+  </node>
+
+  <!-- MAVROS, PX4 SITL, Gazebo -->
+  <include file="$(find px4)/launch/mavros_posix_sitl.launch">
+      <arg name="respawn_gazebo" value="true"/>
+      <arg name="respawn_mavros" value="true"/>
+      <arg name="verbose" value="true"/>
+  </include>
+
+  <node name="jason_hw_bridge" pkg="jason_ros" type="hw_bridge.py"
+    args="-a $(find active-perception-experiments)/config/actions_manifest
+    -p $(find active-perception-experiments)/config/perceptions_manifest"/>
+
+  <node name="jason_agent" pkg="jason_ros" type="gradle_starter.sh"
+    args="$(find active-perception-experiments)/src/scout/build.gradle" output="screen"/>
+
+  <node name="path_rqt_plot" pkg="rqt_multiplot" type="rqt_multiplot"
+    args="--multiplot-config $(find active-perception-experiments)/config/path.xml --multiplot-run-all"/>
+</launch>
