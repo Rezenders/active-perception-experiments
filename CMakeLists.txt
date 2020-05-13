@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(active-perception-experiments)
+
+find_package(catkin REQUIRED COMPONENTS
+  jason_hw_bridge
+  jason_msgs
+)
+
+catkin_package(
+)
+
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+)
