@@ -19,7 +19,8 @@
   <exec_depend>jason_ros</exec_depend>
   <exec_depend>jason_ros_msgs</exec_depend>
   <exec_depend>mavros</exec_depend>
-
+  <exec_depend>geodesy</exec_depend>
+  <exec_depend>rqt_multiplot</exec_depend>
 
   <export>
   </export>
