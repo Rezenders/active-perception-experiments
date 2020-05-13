@@ -29,8 +29,23 @@ dependencies = geographic_msgs.msg
 params_name = pose.position.latitude, pose.position.longitude, pose.position.altitude
 params_type = float, float, float
 
+[setpoint_local]
+method = topic
+name = /mavros/setpoint_position/local
+msg_type = geometry_msgs/PoseStamped
+params_name = pose.position.x, pose.position.y, pose.position.z
+params_type = float, float, float
+
 [land]
 method = service
 name = /mavros/cmd/land
 msg_type = CommandTOL
 dependencies = mavros_msgs.srv
+
+[plan_path]
+method = topic
+name = /plan_path/goal
+msg_type = boustrophedon_msgs/PlanMowingPathActionGoal
+params_name = goal.robot_position.pose.position.x, goal.robot_position.pose.position.y, goal.robot_position.pose.position.z, goal.robot_position.pose.orientation.x, goal.robot_position.pose.orientation.y, goal.robot_position.pose.orientation.z, goal.robot_position.pose.orientation.w , goal.property.polygon.points
+params_type = float, float, float, float, float, float, float, geometry_msgs/Point32[](x,y,z)
+latch = True
