@@ -7,8 +7,9 @@
 
 +!rescueVictim : victim(Lat, Long)
 	<-	.print("Starting Jason Agent node.");
+			.wait(state(_,"True",_));
 			!setMode("GUIDED");
-			arm_motors(True);
+			!armMotor;
 			!takeOff(5);
 			!goToPos(Lat, Long, 40);
 			!dropBuoy(Lat, Long);
@@ -32,9 +33,21 @@
 			+victim(Lat, Long)[ap(T),lu(HH,MM,SS,MS)].
 
 
-+!setMode(Mode)
++!setMode(Mode) : not state(Mode,_,_)
 	<- 	set_mode(Mode);
-			.wait(state(Mode)).
+			.wait(state(Mode,_,_), 1000).
+
++!setMode(Mode).
+
+-!setMode(Mode) <- !setMode(Mode).
+
++!armMotor : not state(Mode,_,"True")
+	<-	arm_motors(True);
+			.wait(state(Mode,_,"True"), 1000).
+
++!armMotor.
+
+-!armMotor <- !armMotor.
 
 +!takeOff(Alt)
 	<-	takeoff(Alt);
@@ -46,6 +59,6 @@
 
 +!returnToLand
 	<-	set_mode("RTL");
-		.wait(global_pos(X,Y) & home_pos(X2,Y2) & math.abs(X -(X2)) <=0.00001 & math.abs(Y -(Y2)) <=0.00001 & altitude(A) & math.abs(A-0) <= 0.1).
+			.wait(global_pos(X,Y) & home_pos(X2,Y2) & math.abs(X -(X2)) <=0.00001 & math.abs(Y -(Y2)) <=0.00001 & altitude(A) & math.abs(A-0) <= 0.1).
 
 {apply_ap}
