@@ -21,6 +21,8 @@
   <exec_depend>mavros</exec_depend>
   <exec_depend>geodesy</exec_depend>
   <exec_depend>rqt_multiplot</exec_depend>
+  <exec_depend>boustrophedon_msgs</exec_depend>
+  <exec_depend>boustrophedon_server</exec_depend>
 
   <export>
   </export>
