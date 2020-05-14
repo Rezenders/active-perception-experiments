@@ -5,7 +5,7 @@ setpoint_goal(0,0,0).
 
 +!plan_path: local_pos(X1,Y1,Z1,X2,Y2,Z2,W2)
 	<- 	?search_area(A);
-			plan_path(X1,Y1,Z1,X2,Y2,Z2,W2,[[X1-A,Y1,0],[X1-A,Y1+A,0],[X1+A,Y1+A,0],[X1+A,Y1,0]]).
+			plan_path(X1,Y1,Z1,X2,Y2,Z2,W2,[[X1-A,Y1+12.5,0],[X1-A,Y1+A+12.5,0],[X1+A,Y1+A+12.5,0],[X1+A,Y1+12.5,0]]).
 
 +!plan_path <- !plan_path.
 

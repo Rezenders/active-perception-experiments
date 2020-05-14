@@ -23,6 +23,8 @@
       <arg name="respawn_gazebo" value="true"/>
       <arg name="respawn_mavros" value="true"/>
       <arg name="verbose" value="true"/>
+      <arg name="sdf" default="$(find mavlink_sitl_gazebo)/models/iris_downward_depth_camera/iris_downward_depth_camera.sdf"/>
+      <arg name="world" default="$(find active-perception-experiments)/worlds/rescue.world"/>
   </include>
 
   <node name="jason_hw_bridge" pkg="jason_ros" type="hw_bridge.py"
@@ -34,4 +36,6 @@
 
   <node name="path_rqt_plot" pkg="rqt_multiplot" type="rqt_multiplot"
     args="--multiplot-config $(find active-perception-experiments)/config/path.xml --multiplot-run-all"/>
+
+
 </launch>
