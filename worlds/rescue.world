@@ -87,21 +87,110 @@
 
     <include>
       <name>victim1</name>
-      <pose>10 27.5 0 0 0 0</pose>
-      <uri>model://Survivor Male</uri>
+      <pose>10 17.5 0.1 -1.57 0 0</pose>
+      <uri>model://rescue_randy</uri>
     </include>
 
     <include>
       <name>victim2</name>
-      <pose>-18 19.5 0 0 0 -1.57</pose>
-      <uri>model://Survivor Female</uri>
+      <pose>-18 14.5 0.1 -1.57 0 0</pose>
+      <uri>model://OpScrubs</uri>
     </include>
 
     <include>
       <name>victim3</name>
-      <pose>0 42.5 0 0 0 0</pose>
+      <pose>0 15.5 0 0 0 0</pose>
+      <uri>model://Survivor Female</uri>
+    </include>
+
+    <include>
+      <name>victim4</name>
+      <pose>0 18.5 0.1 -1.57 0 -2.7</pose>
+      <uri>model://OpScrubs</uri>
+    </include>
+
+    <include>
+      <name>victim5</name>
+      <pose>-7 21.5 0.1 -1.57 0 -0.57</pose>
+      <uri>model://rescue_randy</uri>
+    </include>
+
+    <include>
+      <name>victim6</name>
+      <pose>15 16.5 0 0 0 0.97</pose>
+      <uri>model://Survivor Female</uri>
+    </include>
+
+    <include>
+      <name>victim7</name>
+      <pose>8 22.5 0 0 0 1.3</pose>
       <uri>model://Survivor Male</uri>
     </include>
 
+    <include>
+      <name>victim8</name>
+      <pose>0 32.5 0.1 -1.57 0 -2.7</pose>
+      <uri>model://OpScrubs</uri>
+    </include>
+
+    <include>
+      <name>victim9</name>
+      <pose>-7 31.5 0.1 -1.57 0 -0.57</pose>
+      <uri>model://rescue_randy</uri>
+    </include>
+
+    <include>
+      <name>victim10</name>
+      <pose>15 26.5 0 0 0 0.97</pose>
+      <uri>model://Survivor Female</uri>
+    </include>
+
+    <include>
+      <name>victim11</name>
+      <pose>8 32.5 0 0 0 1.3</pose>
+      <uri>model://Survivor Male</uri>
+    </include>
+
+    <include>
+      <name>victim12</name>
+      <pose>-17 31.5 0.1 1.57 0 -0.57</pose>
+      <uri>model://rescue_randy</uri>
+    </include>
+
+    <include>
+      <name>victim13</name>
+      <pose>25 26.5 0 0 0 0.97</pose>
+      <uri>model://Survivor Female</uri>
+    </include>
+
+    <include>
+      <name>victim14</name>
+      <pose>18 32.5 0 0 0 1.3</pose>
+      <uri>model://Survivor Male</uri>
+    </include>
+
+    <include>
+      <name>victim15</name>
+      <pose>8 42.5 0 -1.57 0 1.3</pose>
+      <uri>model://Standing person</uri>
+    </include>
+
+    <include>
+      <name>victim16</name>
+      <pose>-17 41.5 0.1 1.57 0 -0.57</pose>
+      <uri>model://Standing person</uri>
+    </include>
+
+    <include>
+      <name>victim17</name>
+      <pose>25 36.5 0 -1.57 0 0.97</pose>
+      <uri>model://Standing person</uri>
+    </include>
+
+    <include>
+      <name>victim18</name>
+      <pose>18 42.5 0 0 0 1.3</pose>
+      <uri>model://Survivor Male</uri>
+    </include>
   </world>
 </sdf>
