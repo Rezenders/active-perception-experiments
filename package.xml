@@ -23,6 +23,7 @@
   <exec_depend>rqt_multiplot</exec_depend>
   <exec_depend>boustrophedon_msgs</exec_depend>
   <exec_depend>boustrophedon_server</exec_depend>
+  <exec_depend>cob_people_object_detection_tensorflow</exec_depend>
 
   <export>
   </export>
