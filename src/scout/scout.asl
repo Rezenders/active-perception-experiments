@@ -1,11 +1,15 @@
 search_area(25).
-flight_altitude(5).
+flight_altitude(3).
 setpoint_goal(0,0,0).
+!set_max_speed(5).
 !plan_path.
+
++!set_max_speed(S)
+	<- set_fcu_param("MPC_XY_VEL_MAX",0,5.0).
 
 +!plan_path: local_pos(X1,Y1,Z1,X2,Y2,Z2,W2)
 	<- 	?search_area(A);
-			plan_path(X1,Y1,Z1,X2,Y2,Z2,W2,[[X1-A,Y1+12.5,0],[X1-A,Y1+A+12.5,0],[X1+A,Y1+A+12.5,0],[X1+A,Y1+12.5,0]]).
+			plan_path(X1,Y1,Z1,X2,Y2,Z2,W2,[[X1-A,Y1+12.5,0],[X1-A,Y1+A+32.5,0],[X1+A,Y1+A+32.5,0],[X1+A,Y1+12.5,0]]).
 
 +!plan_path <- !plan_path.
 
