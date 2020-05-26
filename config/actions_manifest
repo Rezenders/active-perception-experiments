@@ -49,3 +49,10 @@ msg_type = boustrophedon_msgs/PlanMowingPathActionGoal
 params_name = goal.robot_position.pose.position.x, goal.robot_position.pose.position.y, goal.robot_position.pose.position.z, goal.robot_position.pose.orientation.x, goal.robot_position.pose.orientation.y, goal.robot_position.pose.orientation.z, goal.robot_position.pose.orientation.w , goal.property.polygon.points
 params_type = float, float, float, float, float, float, float, geometry_msgs/Point32[](x,y,z)
 latch = True
+
+[set_fcu_param]
+method = service
+name = /mavros/param/set
+msg_type = mavros_msgs/ParamSet
+params_name = param_id, value.integer, value.real
+params_type = str, int, float
