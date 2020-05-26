@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="rescue_randy">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://rescue_randy/meshes/rescue_randy.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://rescue_randy/meshes/rescue_randy.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <specular>1.0 1.0 1.0</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://rescue_randy/materials/textures/rescue_randy_albedo.png</albedo_map>
+              <normal_map>model://rescue_randy/materials/textures/rescue_randy_normal.png</normal_map>
+              <metalness_map>model://rescue_randy/materials/textures/rescue_randy_metalness.png</metalness_map>
+              <roughness_map>model://rescue_randy/materials/textures/rescue_randy_roughness.png</roughness_map>
+            </metal>
+          </pbr>
+          <!-- fallback to classic if no PBR support-->
+          <script>
+            <uri>model://rescue_randy/materials/scripts</uri>
+            <uri>model://rescue_randy/materials/textures</uri>
+            <name>RescueRandy/Diffuse</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
