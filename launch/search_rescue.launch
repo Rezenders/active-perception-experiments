@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- MAVROS posix SITL environment launch script -->
+    <!-- launches Gazebo environment and 2x: MAVROS, PX4 SITL, and spawns vehicle -->
+    <!-- vehicle model and world -->
+    <arg name="est" default="ekf2"/>
+    <arg name="vehicle" default="iris"/>
+    <arg name="world" default="$(find active-perception-experiments)/worlds/rescue.world"/>
+
+    <!-- gazebo configs -->
+    <arg name="gui" default="true"/>
+    <arg name="debug" default="false"/>
+    <arg name="verbose" default="false"/>
+    <arg name="paused" default="false"/>
+
+    <!-- Gazebo sim -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="world_name" value="$(arg world)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="verbose" value="$(arg verbose)"/>
+        <arg name="paused" value="$(arg paused)"/>
+    </include>
+
+    <!-- SCOUT -->
+    <arg name="scout" value="scout"/>
+    <group ns="$(arg scout)">
+        <!-- MAVROS and vehicle configs -->
+        <arg name="ID" value="0"/>
+        <arg name="fcu_url" default="udp://:14540@localhost:14580"/>
+        <!-- PX4 SITL and vehicle spawn -->
+        <include file="$(find active-perception-experiments)/launch/single_vehicle_spawn.launch">
+            <arg name="x" value="0"/>
+            <arg name="y" value="0"/>
+            <arg name="z" value="0"/>
+            <arg name="R" value="0"/>
+            <arg name="P" value="0"/>
+            <arg name="Y" value="0"/>
+            <arg name="vehicle" value="$(arg vehicle)"/>
+            <arg name="model_name" value="$(arg scout)"/>
+            <arg name="mavlink_udp_port" value="14560"/>
+            <arg name="mavlink_tcp_port" value="4560"/>
+            <arg name="ID" value="$(arg ID)"/>
+            <arg name="urdf" value="$(find active-perception-experiments)/description/iris_camera_base.xacro"/>
+        </include>
+        <!-- MAVROS -->
+        <include file="$(find mavros)/launch/px4.launch">
+            <arg name="fcu_url" value="$(arg fcu_url)"/>
+            <arg name="gcs_url" value=""/>
+            <arg name="tgt_system" value="$(eval 1 + arg('ID'))"/>
+            <arg name="tgt_component" value="1"/>
+        </include>
+
+        <node pkg="boustrophedon_server" type="boustrophedon_planner_server" name="boustrophedon_server"  output="screen" >
+            <param name="repeat_boundary" value="false"/>
+            <param name="outline_clockwise" value="true"/>
+            <param name="skip_outlines" value="false"/>
+            <param name="outline_layer_count" value="0"/>
+            <param name="stripe_separation" value="1.5"/>
+            <param name="intermediary_separation" value="0.0"/>
+            <param name="stripe_angle" value="0.0"/>
+            <param name="enable_stripe_angle_orientation" value="true" />
+            <param name="travel_along_boundary" value="false" />
+            <param name="allow_points_outside_boundary" value="true" />
+            <!-- Note: if enabling half-y turns, must have an outline_layer_count >= 1 -->
+            <param name="enable_half_y_turns" value="false" />
+            <param name="points_per_turn" value="15" />
+            <param name="turn_start_offset" value="0.5" />
+            <param name="publish_polygons" value="true"/>
+            <param name="publish_path_points" value="true"/>
+        </node>
+
+        <arg name="agent_path" default="$(find active-perception-experiments)/src/scout_px4"/>
+        <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
+        <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/perceptions_manifest"/>
+
+        <node name="jason_hw_bridge" pkg="jason_ros" type="hw_bridge.py"
+          args="-a $(arg actions_manifest) -p $(arg perceptions_manifest)"/>
+
+        <node name="jason_agent" pkg="jason_ros" type="gradle_starter.sh" output="screen"
+          args="$(arg agent_path)/build.gradle"/>
+
+        <remap from="/object_detection/detections" to="object_detection/detections"/>
+        <remap from="/object_detection/detections_image" to="object_detection/detections_image"/>
+        <remap from="/object_tracker/tracks" to="object_tracker/tracks"/>
+
+        <node name="cob_people_object_detection_detection" pkg="cob_people_object_detection_tensorflow" type="cob_people_object_detection_tensorflow.py" output="screen">
+          <param name="~model_name" value="victim_inference_graph3"/>
+          <param name="~num_of_classes" value="1"/>
+          <param name="~label_file" value="search_rescue.pbtxt"/>
+          <param name="~camera_namespace" value="/scout/camera_cam/image_raw"/>
+          <param name="~depth_namespace" value="/camera/depth/image_raw"/>
+          <param name="~video_name" value="no"/>
+          <param name="~num_workers" value="-1"/>
+        </node>
+
+        <include file="$(find cob_people_object_detection_tensorflow)/launch/cob_people_object_tracker.launch" />
+    </group>
+</launch>
+<!-- to add more UAVs (up to 10):
+Increase the id
+Change the name space
+Set the FCU to default="udp://:14540+id@localhost:14550+id"
+Set the malink_udp_port to 14560+id) -->

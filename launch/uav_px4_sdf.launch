@@ -1,0 +1,52 @@
+<launch>
+  <!-- Posix SITL environment launch script -->
+  <!-- launches PX4 SITL, Gazebo environment, and spawns vehicle -->
+  <!-- vehicle pose -->
+  <arg name="x" default="0"/>
+  <arg name="y" default="0"/>
+  <arg name="z" default="0"/>
+  <arg name="R" default="0"/>
+  <arg name="P" default="0"/>
+  <arg name="Y" default="0"/>
+  <!-- vehicle model and world -->
+  <arg name="est" default="ekf2"/>
+  <arg name="vehicle" default="iris"/>
+  <!-- <arg name="world" default="$(find active-perception-experiments)/worlds/rescue.world"/> -->
+  <arg name="sdf" default="$(find mavlink_sitl_gazebo)/models/iris_downward_depth_camera/iris_downward_depth_camera.sdf"/>
+  <env name="PX4_SIM_MODEL" value="$(arg vehicle)" />
+  <env name="PX4_ESTIMATOR" value="$(arg est)" />
+
+  <!-- PX4 configs -->
+  <arg name="interactive" default="true"/>
+
+  <!-- MAVROS configs -->
+  <arg name="fcu_url" default="udp://:14540@localhost:14557"/>
+  <arg name="respawn_mavros" default="false"/>
+
+  <!-- PX4 SITL -->
+  <arg unless="$(arg interactive)" name="px4_command_arg1" value="-d"/>
+  <arg     if="$(arg interactive)" name="px4_command_arg1" value=""/>
+  <node name="sitl" pkg="px4" type="px4" output="screen"
+      args="$(find px4)/ROMFS/px4fmu_common -s etc/init.d-posix/rcS $(arg px4_command_arg1)" required="true"/>
+
+  <!-- gazebo model -->
+  <node name="$(anon vehicle_spawn)" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(arg sdf) -model $(arg vehicle) -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/>
+
+  <include file="$(find mavros)/launch/px4.launch">
+      <!-- GCS link is provided by SITL -->
+      <arg name="gcs_url" value=""/>
+      <arg name="fcu_url" value="$(arg fcu_url)"/>
+      <arg name="respawn_mavros" value="$(arg respawn_mavros)"/>
+  </include>
+
+  <arg name="agent_path" default="$(find active-perception-experiments)/src/scout_px4"/>
+  <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
+  <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/perceptions_manifest"/>
+
+  <node name="jason_hw_bridge" pkg="jason_ros" type="hw_bridge.py"
+    args="-a $(arg actions_manifest) -p $(arg perceptions_manifest)"/>
+
+  <node name="jason_agent" pkg="jason_ros" type="gradle_starter.sh" output="screen"
+    args="$(arg agent_path)/build.gradle"/>
+
+</launch>
