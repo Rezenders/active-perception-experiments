@@ -40,3 +40,9 @@ name = /plan_path/result
 msg_type = boustrophedon_msgs/PlanMowingPathActionResult
 args = result.plan.points[](point.x, point.y, point.z)
 buf = update
+
+[object_tracker]
+name = /object_tracker/tracks
+msg_type = cob_perception_msgs/DetectionArray
+args = detections[](label, id, score)
+buf = add
