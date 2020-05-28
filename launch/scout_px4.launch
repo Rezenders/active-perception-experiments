@@ -31,7 +31,7 @@
     -p $(find active-perception-experiments)/config/perceptions_manifest"/>
 
   <node name="jason_agent" pkg="jason_ros" type="gradle_starter.sh"
-    args="$(find active-perception-experiments)/src/scout/build.gradle"/>
+    args="$(find active-perception-experiments)/src/scout_px4/build.gradle"/>
 
   <node name="cob_people_object_detection_detection" pkg="cob_people_object_detection_tensorflow" type="cob_people_object_detection_tensorflow.py" output="screen">
     <rosparam command="load" file="$(find active-perception-experiments)/params/cob_people_object_detection_tensorflow_params.yaml"/>
