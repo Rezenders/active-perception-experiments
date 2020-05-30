@@ -1,0 +1,6 @@
+MAS rescuer_px4 {
+
+    infrastructure: Centralised
+
+    agents: rescuer agentArchClass jasonros.RosArch;
+}
