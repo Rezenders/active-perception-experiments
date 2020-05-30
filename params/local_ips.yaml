@@ -1,0 +1,4 @@
+address_scout: [127.0.0.1, 1024]
+address_rescuer1: [127.0.0.1, 1034]
+address_rescuer2: [127.0.0.1, 1044]
+# address_rescuer: [127.0.0.1, 1054]
