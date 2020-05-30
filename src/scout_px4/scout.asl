@@ -15,11 +15,12 @@ setpoint_goal(0,0,0).
 +!planPath <- !planPath.
 
 +plan_path_result(PLIST)
-	<-
-			!!publishSetPoint;
-			.wait(1000);
+	<-	!!publishSetPoint;
+			.wait(2000);
+			!armMotor;
 			!setMode("OFFBOARD");
 			!armMotor;
+			!!contactRescuers;
 			!defineGoal(PLIST).
 
 +object_tracker(OBJ_LIST)
@@ -37,19 +38,39 @@ setpoint_goal(0,0,0).
 
 @addVictim[atomic]
 +!addVictim(ID, Score) : victim(ID, S, _, _, _, _) & Score > S
-	<- 	?global_pos(Lat, Long);
+	<- 	?global_pos(Lat, Long, _);
 			?local_pos(X, Y,_,_,_,_,_);
 			-victim(ID,_,_,_,_,_);
 			+victim(ID, Score, Lat, Long, X, Y).
 
 @addVictim2[atomic]
 +!addVictim(ID, Score): not victim(ID,_,_,_,_,_)
-	<- 	?global_pos(Lat, Long);
+	<- 	?global_pos(Lat, Long, _);
 			?local_pos(X, Y,_,_,_,_,_);
 			+victim(ID, Score, Lat, Long, X, Y).
 
-@addVictim3[atomic]
 +!addVictim(ID, Score).
+
++victim(ID, Score, Lat, Long, X, Y)
+	<-	.resume(contactRescuers).
+
++!contactRescuers: victim(_,_,_,_,_,_)
+ 	<- 	.wait(5000);
+			.findall([ID, Score, Lat, Long, X, Y], victim(ID, Score, Lat, Long, X, Y), VLIST);
+			!informVictim(VLIST);
+			!contactRescuers.
+
++!contactRescuers <- .suspend; !contactRescuers.
+
++!informVictim([H|T])
+	<- 	 H = [ID, Score, Lat, Long, X, Y]
+			.print(H);
+			.broadcast(tell, victim_in_need(ID, Lat, Long));
+			-victim(ID, Score, Lat, Long, X, Y);
+			.wait(500);
+			!informVictim(T).
+
++!informVictim([]).
 
 +!defineGoal([H|T])
 	<- 	H = [X, Y, _];
@@ -68,17 +89,18 @@ setpoint_goal(0,0,0).
 
 +!armMotor : not state(_,_,"True")
 	<-	arm_motors(True);
-			.wait(state(_,_,"True"), 1000).
+			.wait(state(_,_,"True"), 500).
 
 +!armMotor.
 
 -!armMotor <- !armMotor.
 
 +!setMode(Mode) : not state(Mode,_,_)
-	<- 	!armMotor;
-			set_mode(Mode);
-			.wait(state(Mode,_,_), 1000).
+	<- 	set_mode(Mode);
+			.wait(state(Mode,_,_), 200).
 
 +!setMode(Mode).
 
 -!setMode(Mode) <- !setMode(Mode).
+
++!mark_as_rescued(N, Lat, Long).
