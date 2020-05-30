@@ -21,7 +21,7 @@ dependencies = mavros_msgs.srv
 params_name = altitude
 params_type = float
 
-[setpoint]
+[setpoint_global]
 method = topic
 name = /mavros/setpoint_position/global
 msg_type = GeoPoseStamped
