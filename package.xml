@@ -12,12 +12,26 @@
 
 
   <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <exec_depend>roscpp</exec_depend>
+
+  <build_depend>gazebo_ros</build_depend>
+  <build_export_depend>gazebo_ros</build_export_depend>
+
+  <build_depend>gazebo_msgs</build_depend>
+  <build_export_depend>gazebo_msgs</build_export_depend>
+  <exec_depend>gazebo_msgs</exec_depend>
+
   <build_depend>jason_ros</build_depend>
-  <build_depend>jason_ros_msgs</build_depend>
   <build_export_depend>jason_ros</build_export_depend>
-  <build_export_depend>jason_ros_msgs</build_export_depend>
   <exec_depend>jason_ros</exec_depend>
+
+  <build_depend>jason_ros_msgs</build_depend>
+  <build_export_depend>jason_ros_msgs</build_export_depend>
   <exec_depend>jason_ros_msgs</exec_depend>
+
   <exec_depend>mavros</exec_depend>
   <exec_depend>geodesy</exec_depend>
   <exec_depend>rqt_multiplot</exec_depend>
@@ -26,5 +40,6 @@
   <exec_depend>cob_people_object_detection_tensorflow</exec_depend>
 
   <export>
+    <gazebo_ros plugin_path="${prefix}/../../lib" gazebo_media_path="${prefix}" />
   </export>
 </package>

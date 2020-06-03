@@ -192,5 +192,6 @@
       <pose>18 42.5 0 0 0 1.3</pose>
       <uri>model://Survivor Male</uri>
     </include> -->
+    <plugin name="spawn_buoy" filename="libspawn_buoy.so"/>
   </world>
 </sdf>
