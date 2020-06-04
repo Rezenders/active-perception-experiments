@@ -2,11 +2,15 @@ water_y_offset(12.5).
 search_area(10).
 flight_altitude(3).
 setpoint_goal(0,0,0).
+!setRTLAtlitude(5).
 !setMaxSpeed(3).
 !planPath.
 
 +!setMaxSpeed(S)
 	<- set_fcu_param("MPC_XY_VEL_MAX", 0, S).
+
++!setRTLAtlitude(A)
+	<- set_fcu_param("RTL_RETURN_ALT", 0, A).
 
 +!planPath: local_pos(X1,Y1,Z1,X2,Y2,Z2,W2)
 	<- 	?search_area(A);?water_y_offset(Y_OFFSET);

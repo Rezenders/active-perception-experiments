@@ -1,6 +1,11 @@
 flight_altitude(2).
 
-// !startPublishingSetPoints.
+!setRTLAtlitude(3).
+!startPublishingSetPoints.
+
++!setRTLAtlitude(A)
+  <-  set_fcu_param("RTL_RETURN_ALT", 0, A);
+      set_fcu_param("RTL_DESCEND_ALT", 0, A-0.5).
 
 +!startPublishingSetPoints
   <-  .wait(home_pos(HLat, HLong, _));
