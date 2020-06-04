@@ -95,7 +95,7 @@
           <param name="~camera_namespace" value="/scout/camera_cam/image_raw"/>
           <param name="~depth_namespace" value="/camera/depth/image_raw"/>
           <param name="~video_name" value="no"/>
-          <param name="~num_workers" value="-1"/>
+          <param name="~num_workers" value="1"/>
         </node>
 
         <include file="$(find cob_people_object_detection_tensorflow)/launch/cob_people_object_tracker.launch" />
@@ -153,10 +153,8 @@
     <!-- RESCUER2 -->
     <arg name="rescuer2" value="rescuer2"/>
     <group ns="$(arg rescuer2)">
-        <!-- MAVROS and vehicle configs -->
         <arg name="ID" value="2"/>
         <arg name="fcu_url" default="udp://:14542@localhost:14582"/>
-        <!-- PX4 SITL and vehicle spawn -->
         <include file="$(find active-perception-experiments)/launch/single_vehicle_spawn.launch">
             <arg name="x" value="-2.5"/>
             <arg name="y" value="-5"/>
@@ -171,7 +169,6 @@
             <arg name="ID" value="$(arg ID)"/>
             <arg name="urdf" value="$(find active-perception-experiments)/description/iris_camera_base.xacro"/>
         </include>
-        <!-- MAVROS -->
         <include file="$(find mavros)/launch/px4.launch">
             <arg name="fcu_url" value="$(arg fcu_url)"/>
             <arg name="gcs_url" value=""/>
