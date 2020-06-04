@@ -45,7 +45,7 @@ flight_altitude(2).
 +!broadcastProposal(I, Me, N, R) : I>0
   <-  .broadcast(tell, propose(Me, N, R));
       .wait(200);
-      !broadcastProposal(I-1, Me, N, R);
+      !broadcastProposal(I-1, Me, N, R).
 
 +!broadcastProposal(I, Me, N, R).
 
@@ -61,7 +61,7 @@ flight_altitude(2).
 			?victim_in_need(N, Lat, Long);
       .abolish(victim_in_need(N, Lat, Long));
 			.broadcast(achieve, mark_as_rescued(N, Lat, Long));
-      !!startPublishingSetPoints;
+      .resume(publishSetPoint);
 			!!rescueVictim(N, Lat, Long).
 
 +!check_winner(N, Who)
@@ -73,6 +73,9 @@ flight_altitude(2).
 			!setMode("OFFBOARD");
 			!armMotor;
       !defineGoal([[Lat, Long,_]]);
+      !getGazeboPos;
+      ?gazebo_pos(X, Y, Z);
+      drop_buoy(X, Y, Z-0.15);
 			.print("Droping buoy to victim ", N);
 			.broadcast(tell, victim_rescued(N, Lat, Long));
       !returnHome;
@@ -93,27 +96,46 @@ flight_altitude(2).
 +!publishSetPoint
 	<-	?setpoint_goal(X, Y, Z);
 			setpoint_global(X,Y,Z);
-			.wait(200);
+			.wait(100);
 			!publishSetPoint.
 
 +!returnHome
-  <-  .drop_intention(publishSetPoint);
-      .wait(global_pos(X,Y,Z) & home_pos(X2,Y2,Z2) & math.abs(X2 -(X)) <=0.00001 & math.abs(Y2 -(Y)) <=0.00001 & math.abs(Z2 -(Z)) <= 0.1);
+  <-  .suspend(publishSetPoint);
+      ?home_pos(X2,Y2,Z2);
+      -+setpoint_goal(X2, Y2, Z2);
+      .wait(global_pos(X,Y,Z) & math.abs(X2 -(X)) <=0.00001 & math.abs(Y2 -(Y)) <=0.00001 & math.abs(Z2 -(Z)) <= 0.1);
       .print("Landed! beginning charging and buoy replacement!");
       .wait(2000).
 
 +!armMotor : not state(_,_,"True")
 	<-	arm_motors(True);
-			.wait(state(_,_,"True"), 500).
+			.wait(400);
+      !armMotor.
 
 +!armMotor.
 
--!armMotor <- !armMotor.
+// -!armMotor <- !armMotor.
 
 +!setMode(Mode) : not state(Mode,_,_)
 	<- 	set_mode(Mode);
-			.wait(state(Mode,_,_), 200).
+      .wait(200);
+      !setMode(Mode).
 
 +!setMode(Mode).
 
--!setMode(Mode) <- !setMode(Mode).
+// -!setMode(Mode) <- !setMode(Mode).
+
++!getGazeboPos
+  <-  ?model_states(Models, Poses);
+      .length(Models, Length);
+      for(.range(I, 0, Length-1)){
+        .nth(I, Models, Model); .term2string(Model, SModel);
+        .my_name(Me); .term2string(Me, SMe);
+        if(SModel == SMe){
+          .abolish(gazebo_pos(_,_,_));
+          .nth(I, Poses, Pose);
+          Pose = [X, Y, Z];
+          +gazebo_pos(X, Y, Z);
+        }
+      }
+      .
