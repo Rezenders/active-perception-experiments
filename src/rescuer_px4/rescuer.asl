@@ -69,13 +69,14 @@ flight_altitude(2).
 
 +!rescueVictim(N, Lat, Long)
 	<- 	.wait(1000);
-			!armMotor;
-			!setMode("OFFBOARD");
-			!armMotor;
+			// !armMotor;
+			// !setMode("OFFBOARD");
+			// !armMotor;
+      +mode("Fly");
       !defineGoal([[Lat, Long,_]]);
       !getGazeboPos;
       ?gazebo_pos(X, Y, Z);
-      drop_buoy(X, Y, Z-0.15);
+      drop_buoy(X, Y, Z-0.25);
 			.print("Droping buoy to victim ", N);
 			.broadcast(tell, victim_rescued(N, Lat, Long));
       !returnHome;
@@ -87,25 +88,37 @@ flight_altitude(2).
 +!defineGoal([H|T])
 	<- 	H = [X, Y, _];
 			?flight_altitude(Z);
-			-+setpoint_goal(X, Y, Z);
-			.wait(global_pos(X2,Y2,Z2) & home_pos(_,_,A) & math.abs(X2 -(X)) <=0.00001 & math.abs(Y2 -(Y)) <=0.00001 & math.abs(Z2 -(A+Z)) <= 0.5);
+      ?altitude(A);
+      ?home_pos(_,_,HA);
+			-+setpoint_goal(X, Y, A+Z);
+			.wait(global_pos(X2,Y2,Z2) & math.abs(X2 -(X)) <=0.00001 & math.abs(Y2 -(Y)) <=0.00001 & math.abs(Z2 -(HA+Z)) <= 0.5);
 			!defineGoal(T).
 
 +!defineGoal([]).
 
-+!publishSetPoint
-	<-	?setpoint_goal(X, Y, Z);
++!publishSetPoint : (mode("Fly") & state("OFFBOARD",_,"True")) | (not mode("Fly"))
+	<-	?setpoint_goal(X,Y,Z);
+			setpoint_global(X,Y,Z);
+			// setpoint_local(X,Y,Z);
+			.wait(100);
+			!publishSetPoint.
+
++!publishSetPoint : mode("Fly") & not state("OFFBOARD",_,"True")
+	<-	arm_motors(True);
+			set_mode("OFFBOARD");
+			?setpoint_goal(X,Y,Z);
 			setpoint_global(X,Y,Z);
 			.wait(100);
 			!publishSetPoint.
 
 +!returnHome
   <-  .suspend(publishSetPoint);
+      -mode("Fly");
       ?home_pos(X2,Y2,Z2);
       -+setpoint_goal(X2, Y2, Z2);
       .wait(global_pos(X,Y,Z) & math.abs(X2 -(X)) <=0.00001 & math.abs(Y2 -(Y)) <=0.00001 & math.abs(Z2 -(Z)) <= 0.1);
       .print("Landed! beginning charging and buoy replacement!");
-      .wait(2000).
+      .wait(1000).
 
 +!armMotor : not state(_,_,"True")
 	<-	arm_motors(True);

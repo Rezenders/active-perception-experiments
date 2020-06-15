@@ -30,5 +30,6 @@
       </collision>
 
     </link>
+    <plugin name="lifebuoy" filename="liblifebuoy.so"/>
   </model>
 </sdf>

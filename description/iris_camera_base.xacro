@@ -13,7 +13,7 @@
     image_height="720"
     image_format="R8G8B8"
     min_distance="1"
-    max_distance="20"
+    max_distance="6"
     noise_mean="0.0"
     noise_stddev="0.007"
     enable_visual="1"

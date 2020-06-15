@@ -21,9 +21,10 @@ setpoint_goal(0,0,0).
 +plan_path_result(PLIST)
 	<-	!!publishSetPoint;
 			.wait(2000);
-			!armMotor;
-			!setMode("OFFBOARD");
-			!armMotor;
+			+mode("Fly");
+			// !armMotor;
+			// !setMode("OFFBOARD");
+			// !armMotor;
 			!!contactRescuers;
 			!defineGoal(PLIST).
 
@@ -85,8 +86,16 @@ setpoint_goal(0,0,0).
 
 +!defineGoal([])<- .drop_intention(publishSetPoint).
 
-+!publishSetPoint
++!publishSetPoint : (mode("Fly") & state("OFFBOARD",_,"True")) | (not mode("Fly"))
 	<-	?setpoint_goal(X,Y,Z);
+			setpoint_local(X,Y,Z);
+			.wait(100);
+			!publishSetPoint.
+
++!publishSetPoint : mode("Fly") & not state("OFFBOARD",_,"True")
+	<-	arm_motors(True);
+			set_mode("OFFBOARD");
+			?setpoint_goal(X,Y,Z);
 			setpoint_local(X,Y,Z);
 			.wait(100);
 			!publishSetPoint.

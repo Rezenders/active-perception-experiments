@@ -56,7 +56,7 @@
             <param name="outline_clockwise" value="true"/>
             <param name="skip_outlines" value="false"/>
             <param name="outline_layer_count" value="0"/>
-            <param name="stripe_separation" value="1.5"/>
+            <param name="stripe_separation" value="1.7"/>
             <param name="intermediary_separation" value="0.0"/>
             <param name="stripe_angle" value="0.0"/>
             <param name="enable_stripe_angle_orientation" value="true" />
@@ -72,7 +72,7 @@
 
         <arg name="agent_path" default="$(find active-perception-experiments)/src/scout_px4"/>
         <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
-        <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/perceptions_manifest"/>
+        <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/scout_perceptions_manifest"/>
 
         <node name="jason_hw_bridge" pkg="jason_ros" type="hw_bridge.py"
           args="-a $(arg actions_manifest) -p $(arg perceptions_manifest)"/>
@@ -89,9 +89,9 @@
         <remap from="/object_tracker/tracks" to="object_tracker/tracks"/>
 
         <node name="cob_people_object_detection_detection" pkg="cob_people_object_detection_tensorflow" type="cob_people_object_detection_tensorflow.py" output="screen">
-          <param name="~model_name" value="victim_inference_graph3"/>
-          <param name="~num_of_classes" value="1"/>
-          <param name="~label_file" value="search_rescue.pbtxt"/>
+          <param name="~model_name" value="gazebo_detection"/>
+          <param name="~num_of_classes" value="4"/>
+          <param name="~label_file" value="gazebo_objects.pbtxt"/>
           <param name="~camera_namespace" value="/scout/camera_cam/image_raw"/>
           <param name="~depth_namespace" value="/camera/depth/image_raw"/>
           <param name="~video_name" value="no"/>
@@ -99,15 +99,14 @@
         </node>
 
         <include file="$(find cob_people_object_detection_tensorflow)/launch/cob_people_object_tracker.launch" />
+        <node name="rviz" pkg="rviz" type="rviz" args="-d  $(find active-perception-experiments)/config/search_rescue.rviz"/>
     </group>
 
     <!-- RESCUER1 -->
     <arg name="rescuer1" value="rescuer1"/>
     <group ns="$(arg rescuer1)">
-        <!-- MAVROS and vehicle configs -->
         <arg name="ID" value="1"/>
         <arg name="fcu_url" default="udp://:14541@localhost:14581"/>
-        <!-- PX4 SITL and vehicle spawn -->
         <include file="$(find active-perception-experiments)/launch/single_vehicle_spawn.launch">
             <arg name="x" value="2.5"/>
             <arg name="y" value="-5"/>
@@ -122,7 +121,6 @@
             <arg name="ID" value="$(arg ID)"/>
             <arg name="urdf" value="$(find active-perception-experiments)/description/iris_camera_base.xacro"/>
         </include>
-        <!-- MAVROS -->
         <include file="$(find mavros)/launch/px4.launch">
             <arg name="fcu_url" value="$(arg fcu_url)"/>
             <arg name="gcs_url" value=""/>
@@ -132,13 +130,10 @@
 
         <arg name="agent_path" default="$(find active-perception-experiments)/src/rescuer_px4"/>
         <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
-        <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/perceptions_manifest"/>
+        <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/rescuer_perceptions_manifest"/>
 
         <node name="jason_hw_bridge" pkg="jason_ros" type="hw_bridge.py"
           args="-a $(arg actions_manifest) -p $(arg perceptions_manifest)"/>
-
-        <!-- <node name="jason_agent" pkg="jason_ros" type="gradle_starter.sh" output="screen"
-          args="$(arg agent_path)/build.gradle"/> -->
 
         <node name="jason_agent" pkg="jason_ros" type="gradle_start_new_mas2j.sh"
           args="$(arg agent_path) $(arg rescuer1) rescuer.asl" output="screen">
@@ -178,7 +173,7 @@
 
         <arg name="agent_path" default="$(find active-perception-experiments)/src/rescuer_px4"/>
         <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
-        <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/perceptions_manifest"/>
+        <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/rescuer_perceptions_manifest"/>
 
         <node name="jason_hw_bridge" pkg="jason_ros" type="hw_bridge.py"
           args="-a $(arg actions_manifest) -p $(arg perceptions_manifest)"/>
