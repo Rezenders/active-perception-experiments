@@ -32,16 +32,3 @@ name = object_tracker/tracks
 msg_type = cob_perception_msgs/DetectionArray
 args = detections[](label, id, score)
 buf = add
-
-[home_pos]
-name = mavros/home_position/home
-msg_type = HomePosition
-dependencies = mavros_msgs.msg
-args = geo.latitude, geo.longitude, geo.altitude
-buf = update
-
-[model_states]
-name = /gazebo/model_states
-msg_type = gazebo_msgs/ModelStates
-args = name, pose[](position.x, position.y, position.z)
-buf = update
