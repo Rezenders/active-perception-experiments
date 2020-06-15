@@ -32,3 +32,6 @@ catkin_package(
 
 add_library(spawn_buoy src/gazebo_plugins/spawn_buoy.cpp)
 target_link_libraries(spawn_buoy ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+
+add_library(lifebuoy src/gazebo_plugins/lifebuoy.cpp)
+target_link_libraries(lifebuoy ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
