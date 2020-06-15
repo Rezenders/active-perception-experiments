@@ -9,6 +9,8 @@
 #include "ros/callback_queue.h"
 #include "ros/subscribe_options.h"
 #include "geometry_msgs/Pose.h"
+#include "std_msgs/String.h"
+#include "gazebo_msgs/DeleteModel.h"
 
 namespace gazebo{
   class SpawnBuoyPlugin : public WorldPlugin{
@@ -16,20 +18,41 @@ namespace gazebo{
     physics::WorldPtr world;
 
     std::unique_ptr<ros::NodeHandle> rosNode;
-    ros::Subscriber rosSub;
-    ros::CallbackQueue rosQueue;
-    std::thread rosQueueThread;
+    ros::Subscriber spawnBuoySub;
+    ros::CallbackQueue spawnBuoyQueue;
+    std::thread spawnBuoyThread;
 
-    void QueueThread(){
+    void SpawnBuoyQueueThread(){
       static const double timeout = 0.01;
       while (this->rosNode->ok())
       {
-        this->rosQueue.callAvailable(ros::WallDuration(timeout));
+        this->spawnBuoyQueue.callAvailable(ros::WallDuration(timeout));
+      }
+    }
+
+    ros::Subscriber deleteBuoySub;
+    ros::CallbackQueue deleteBuoyQueue;
+    std::thread deleteBuoyThread;
+
+    void DeleteBuoyQueueThread(){
+      static const double timeout = 0.01;
+      while (this->rosNode->ok())
+      {
+        this->deleteBuoyQueue.callAvailable(ros::WallDuration(timeout));
       }
     }
 
   public:
     SpawnBuoyPlugin() : WorldPlugin(){}
+    ~SpawnBuoyPlugin(){
+      spawnBuoyQueue.clear();
+      deleteBuoyQueue.clear();
+      spawnBuoyQueue.disable();
+      deleteBuoyQueue.disable();
+      rosNode->shutdown();
+      spawnBuoyThread.join();
+      deleteBuoyThread.join();
+    }
 
     void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf){
       if (!ros::isInitialized()){
@@ -37,24 +60,34 @@ namespace gazebo{
           << "Load the Gazebo system plugin 'libgazebo_ros_api_plugin.so' in the gazebo_ros package)");
         return;
       }
-      world = _world;
-      this->rosNode.reset(new ros::NodeHandle("spawn_buoy"));
 
-      ros::SubscribeOptions so =
+
+      world = _world;
+      this->rosNode.reset(new ros::NodeHandle("buoy_handler"));
+
+      ros::SubscribeOptions soSpawnBuoy =
         ros::SubscribeOptions::create<geometry_msgs::Pose>(
           "/rescue_world/drop_buoy",
           1,
-          boost::bind(&SpawnBuoyPlugin::OnRosMsg, this, _1),
-          ros::VoidPtr(), &this->rosQueue);
+          boost::bind(&SpawnBuoyPlugin::spawnBuoyCallback, this, _1),
+          ros::VoidPtr(), &this->spawnBuoyQueue);
 
-      this->rosSub = this->rosNode->subscribe(so);
+      this->spawnBuoySub = this->rosNode->subscribe(soSpawnBuoy);
+      this->spawnBuoyThread =
+        std::thread(std::bind(&SpawnBuoyPlugin::SpawnBuoyQueueThread, this));
 
-      this->rosQueueThread =
-        std::thread(std::bind(&SpawnBuoyPlugin::QueueThread, this));
-
+      ros::SubscribeOptions soDeleteBuoy =
+        ros::SubscribeOptions::create<std_msgs::String>(
+          "/rescue_world/delete_model",
+          1,
+          boost::bind(&SpawnBuoyPlugin::deleteBuoyCallBack, this, _1),
+          ros::VoidPtr(), &this->deleteBuoyQueue);
+      this->deleteBuoySub = this->rosNode->subscribe(soDeleteBuoy);
+      this->deleteBuoyThread =
+        std::thread(std::bind(&SpawnBuoyPlugin::DeleteBuoyQueueThread, this));
     }
 
-    void OnRosMsg(const geometry_msgs::PoseConstPtr &_msg){
+    void spawnBuoyCallback(const geometry_msgs::PoseConstPtr &_msg){
       transport::NodePtr node(new transport::Node());
 
       node->Init(world->Name());
@@ -71,6 +104,13 @@ namespace gazebo{
             ignition::math::Quaterniond(_msg->orientation.x, _msg->orientation.y, _msg->orientation.z )));
 
       factoryPub->Publish(factory_msg);
+    }
+
+    void deleteBuoyCallBack(const std_msgs::String::ConstPtr& msg){
+      gazebo_msgs::DeleteModel del_model;
+      del_model.request.model_name = msg->data;
+      std::cout<<msg->data<<std::endl;
+      ros::service::call("/gazebo/delete_model", del_model);
     }
 
   };
