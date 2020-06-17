@@ -35,3 +35,6 @@ target_link_libraries(spawn_buoy ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
 
 add_library(lifebuoy src/gazebo_plugins/lifebuoy.cpp)
 target_link_libraries(lifebuoy ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
+
+add_library(camera_switch src/gazebo_plugins/camera_switch.cpp)
+target_link_libraries(camera_switch ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
