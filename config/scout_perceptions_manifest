@@ -22,7 +22,7 @@ args = pose.position.x, pose.position.y, pose.position.z, pose.orientation.x,  p
 buf = update
 
 [plan_path_result]
-name = plan_path/result
+name = /plan_path/result
 msg_type = boustrophedon_msgs/PlanMowingPathActionResult
 args = result.plan.points[](point.x, point.y, point.z)
 buf = update
