@@ -22,6 +22,25 @@
         <arg name="paused" value="$(arg paused)"/>
     </include>
 
+    <node pkg="boustrophedon_server" type="boustrophedon_planner_server" name="boustrophedon_server">
+        <param name="repeat_boundary" value="false"/>
+        <param name="outline_clockwise" value="true"/>
+        <param name="skip_outlines" value="false"/>
+        <param name="outline_layer_count" value="0"/>
+        <param name="stripe_separation" value="1.7"/>
+        <param name="intermediary_separation" value="0.0"/>
+        <param name="stripe_angle" value="0.0"/>
+        <param name="enable_stripe_angle_orientation" value="true" />
+        <param name="travel_along_boundary" value="false" />
+        <param name="allow_points_outside_boundary" value="true" />
+        <!-- Note: if enabling half-y turns, must have an outline_layer_count >= 1 -->
+        <param name="enable_half_y_turns" value="false" />
+        <param name="points_per_turn" value="15" />
+        <param name="turn_start_offset" value="0.5" />
+        <param name="publish_polygons" value="true"/>
+        <param name="publish_path_points" value="true"/>
+    </node>
+
     <!-- SCOUT -->
     <arg name="scout" value="scout"/>
     <group ns="$(arg scout)">
@@ -51,25 +70,6 @@
             <arg name="tgt_component" value="1"/>
         </include>
 
-        <node pkg="boustrophedon_server" type="boustrophedon_planner_server" name="boustrophedon_server"  output="screen" >
-            <param name="repeat_boundary" value="false"/>
-            <param name="outline_clockwise" value="true"/>
-            <param name="skip_outlines" value="false"/>
-            <param name="outline_layer_count" value="0"/>
-            <param name="stripe_separation" value="1.7"/>
-            <param name="intermediary_separation" value="0.0"/>
-            <param name="stripe_angle" value="0.0"/>
-            <param name="enable_stripe_angle_orientation" value="true" />
-            <param name="travel_along_boundary" value="false" />
-            <param name="allow_points_outside_boundary" value="true" />
-            <!-- Note: if enabling half-y turns, must have an outline_layer_count >= 1 -->
-            <param name="enable_half_y_turns" value="false" />
-            <param name="points_per_turn" value="15" />
-            <param name="turn_start_offset" value="0.5" />
-            <param name="publish_polygons" value="true"/>
-            <param name="publish_path_points" value="true"/>
-        </node>
-
         <arg name="agent_path" default="$(find active-perception-experiments)/src/scout_px4"/>
         <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
         <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/scout_perceptions_manifest"/>
@@ -80,7 +80,7 @@
         <node name="jason_agent" pkg="jason_ros" type="gradle_starter.sh" output="screen"
           args="$(arg agent_path)/build.gradle"/>
 
-        <node name="comm" pkg="jason_ros_comm" type="comm_udp.py" output="screen">
+        <node name="comm" pkg="jason_ros_comm" type="comm_udp.py">
           <rosparam command="load" file="$(find active-perception-experiments)/params/local_ips.yaml" />
         </node>
 
@@ -88,7 +88,7 @@
         <remap from="/object_detection/detections_image" to="object_detection/detections_image"/>
         <remap from="/object_tracker/tracks" to="object_tracker/tracks"/>
 
-        <node name="cob_people_object_detection_detection" pkg="cob_people_object_detection_tensorflow" type="cob_people_object_detection_tensorflow.py" output="screen">
+        <node name="cob_people_object_detection_detection" pkg="cob_people_object_detection_tensorflow" type="cob_people_object_detection_tensorflow.py">
           <param name="~model_name" value="gazebo_detection"/>
           <param name="~num_of_classes" value="4"/>
           <param name="~label_file" value="gazebo_objects.pbtxt"/>
@@ -139,7 +139,7 @@
           args="$(arg agent_path) $(arg rescuer1) rescuer.asl" output="screen">
         </node>
 
-        <node name="comm" pkg="jason_ros_comm" type="comm_udp.py" output="screen">
+        <node name="comm" pkg="jason_ros_comm" type="comm_udp.py">
           <rosparam command="load" file="$(find active-perception-experiments)/params/local_ips.yaml" />
         </node>
 
