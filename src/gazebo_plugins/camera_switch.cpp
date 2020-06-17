@@ -1,5 +1,5 @@
 #include <thread>
-#include <atomic>
+#include <mutex>
 
 #include "gazebo/common/common.hh"
 #include "gazebo/gazebo.hh"
@@ -22,15 +22,18 @@ namespace gazebo {
     std::unique_ptr<ros::NodeHandle> rosNode;
     ros::ServiceServer service;
 
-    std::atomic<bool> state;
 
+    bool state = false;
+    std::mutex mtx;
     std::thread switchThread_;
+
     void SwitchThread(){
-      // static const double timeout = 0.01;
       while (this->rosNode->ok()){
-        if(this->sensor->IsActive() != state.load()){
-          this->sensor->SetActive(state.load());
+        mtx.lock();
+        if(this->sensor->IsActive() != this->state){
+          this->sensor->SetActive(this->state);
         }
+        mtx.unlock();
       }
     }
 
@@ -39,7 +42,7 @@ namespace gazebo {
 
     ~CameraSwitchPlugin(){
       rosNode->shutdown();
-      // rosQueueThread.join();
+      switchThread_.join();
     }
 
     void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf){
@@ -49,7 +52,7 @@ namespace gazebo {
         return;
       }
 
-      state = false;
+      // state.store(false);
       this->sensor = _sensor;
 
       this->robot_namespace_ =  GetRobotNamespace(_sensor, _sdf, "Camera");
@@ -60,17 +63,16 @@ namespace gazebo {
 
       this->rosNode.reset(new ros::NodeHandle(this->robot_namespace_ + "/" + this->camera_name_));
 
-      this->switchThread_ =
-        std::thread(std::bind(&CameraSwitchPlugin::SwitchThread, this));
-        
       service = rosNode->advertiseService("camera_switch", &CameraSwitchPlugin::OnRosMsg, this);
+      this->switchThread_ = std::thread(&CameraSwitchPlugin::SwitchThread, this);
+
     }
 
+
     bool OnRosMsg(std_srvs::SetBool::Request  &req, std_srvs::SetBool::Response &res){
+      mtx.lock();
       this->state = req.data;
-      // while(this->sensor->IsActive() != req.data){
-      //   this->sensor->SetActive(req.data);
-      // }
+      mtx.unlock();
       return true;
     }
 
