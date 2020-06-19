@@ -22,6 +22,8 @@
         <arg name="paused" value="$(arg paused)"/>
     </include>
 
+    <node name="rviz" pkg="rviz" type="rviz" args="-d  $(find active-perception-experiments)/config/search_rescue_ap.rviz"/>
+
     <!-- SCOUT -->
     <arg name="scout" value="scout"/>
     <group ns="$(arg scout)">
@@ -56,7 +58,7 @@
             <param name="outline_clockwise" value="true"/>
             <param name="skip_outlines" value="false"/>
             <param name="outline_layer_count" value="0"/>
-            <param name="stripe_separation" value="1.7"/>
+            <param name="stripe_separation" value="1.9"/>
             <param name="intermediary_separation" value="0.0"/>
             <param name="stripe_angle" value="0.0"/>
             <param name="enable_stripe_angle_orientation" value="true" />
@@ -89,6 +91,7 @@
         <remap from="/object_tracker/tracks" to="object_tracker/tracks"/>
 
         <node name="cob_people_object_detection_detection" pkg="cob_people_object_detection_tensorflow" type="cob_people_object_detection_tensorflow.py">
+          <env name="CUDA_VISIBLE_DEVICES" value=""/>
           <param name="~model_name" value="gazebo_detection"/>
           <param name="~num_of_classes" value="4"/>
           <param name="~label_file" value="gazebo_objects.pbtxt"/>
@@ -99,7 +102,6 @@
         </node>
 
         <include file="$(find cob_people_object_detection_tensorflow)/launch/cob_people_object_tracker.launch" />
-        <node name="rviz" pkg="rviz" type="rviz" args="-d  $(find active-perception-experiments)/config/search_rescue.rviz"/>
     </group>
 
     <!-- RESCUER1 -->
@@ -128,14 +130,32 @@
             <arg name="tgt_component" value="1"/>
         </include>
 
-        <arg name="agent_path" default="$(find active-perception-experiments)/src/rescuer_px4"/>
+        <node pkg="boustrophedon_server" type="boustrophedon_planner_server" name="boustrophedon_server" >
+            <param name="repeat_boundary" value="false"/>
+            <param name="outline_clockwise" value="true"/>
+            <param name="skip_outlines" value="false"/>
+            <param name="outline_layer_count" value="0"/>
+            <param name="stripe_separation" value="1.5"/>
+            <param name="intermediary_separation" value="0.0"/>
+            <param name="stripe_angle" value="0.0"/>
+            <param name="enable_stripe_angle_orientation" value="true" />
+            <param name="travel_along_boundary" value="false" />
+            <param name="allow_points_outside_boundary" value="true" />
+            <param name="enable_half_y_turns" value="false" />
+            <param name="points_per_turn" value="15" />
+            <param name="turn_start_offset" value="0.5" />
+            <param name="publish_polygons" value="true"/>
+            <param name="publish_path_points" value="true"/>
+        </node>
+
+        <arg name="agent_path" default="$(find active-perception-experiments)/src/rescuer_px4_ap"/>
         <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
         <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/rescuer_perceptions_manifest"/>
 
         <node name="jason_hw_bridge" pkg="jason_ros" type="hw_bridge.py"
           args="-a $(arg actions_manifest) -p $(arg perceptions_manifest)"/>
 
-        <node name="jason_agent" pkg="jason_ros" type="gradle_start_new_mas2j.sh"
+        <node name="jason_agent" pkg="active-perception-experiments" type="gradle_start_new_mas2j_ap.sh"
           args="$(arg agent_path) $(arg rescuer1) rescuer.asl" output="screen">
         </node>
 
@@ -143,11 +163,26 @@
           <rosparam command="load" file="$(find active-perception-experiments)/params/local_ips.yaml" />
         </node>
 
+        <remap from="/object_detection/detections" to="object_detection/detections"/>
+        <remap from="/object_detection/detections_image" to="object_detection/detections_image"/>
+        <remap from="/object_tracker/tracks" to="object_tracker/tracks"/>
+
+        <node name="cob_people_object_detection_detection" pkg="cob_people_object_detection_tensorflow" type="cob_people_object_detection_tensorflow.py">
+          <env name="CUDA_VISIBLE_DEVICES" value=""/>
+          <param name="~model_name" value="gazebo_detection"/>
+          <param name="~num_of_classes" value="4"/>
+          <param name="~label_file" value="gazebo_objects.pbtxt"/>
+          <param name="~camera_namespace" value="/rescuer1/camera_cam/image_raw"/>
+          <param name="~depth_namespace" value="/camera/depth/image_raw"/>
+          <param name="~video_name" value="no"/>
+          <param name="~num_workers" value="1"/>
+        </node>
+        <include file="$(find cob_people_object_detection_tensorflow)/launch/cob_people_object_tracker.launch" />
     </group>
 
     <!-- RESCUER2 -->
     <arg name="rescuer2" value="rescuer2"/>
-    <group ns="$(arg rescuer2)">
+    <!-- <group ns="$(arg rescuer2)">
         <arg name="ID" value="2"/>
         <arg name="fcu_url" default="udp://:14542@localhost:14582"/>
         <include file="$(find active-perception-experiments)/launch/single_vehicle_spawn.launch">
@@ -171,14 +206,32 @@
             <arg name="tgt_component" value="1"/>
         </include>
 
-        <arg name="agent_path" default="$(find active-perception-experiments)/src/rescuer_px4"/>
+        <node pkg="boustrophedon_server" type="boustrophedon_planner_server" name="boustrophedon_server"  output="screen" >
+            <param name="repeat_boundary" value="false"/>
+            <param name="outline_clockwise" value="true"/>
+            <param name="skip_outlines" value="false"/>
+            <param name="outline_layer_count" value="0"/>
+            <param name="stripe_separation" value="1.5"/>
+            <param name="intermediary_separation" value="0.0"/>
+            <param name="stripe_angle" value="0.0"/>
+            <param name="enable_stripe_angle_orientation" value="true" />
+            <param name="travel_along_boundary" value="false" />
+            <param name="allow_points_outside_boundary" value="true" />
+            <param name="enable_half_y_turns" value="false" />
+            <param name="points_per_turn" value="15" />
+            <param name="turn_start_offset" value="0.5" />
+            <param name="publish_polygons" value="true"/>
+            <param name="publish_path_points" value="true"/>
+        </node>
+
+        <arg name="agent_path" default="$(find active-perception-experiments)/src/rescuer_px4_ap"/>
         <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
         <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/rescuer_perceptions_manifest"/>
 
         <node name="jason_hw_bridge" pkg="jason_ros" type="hw_bridge.py"
           args="-a $(arg actions_manifest) -p $(arg perceptions_manifest)"/>
 
-        <node name="jason_agent" pkg="jason_ros" type="gradle_start_new_mas2j.sh"
+        <node name="jason_agent" pkg="active-perception-experiments" type="gradle_start_new_mas2j_ap.sh"
           args="$(arg agent_path) $(arg rescuer2) rescuer.asl" output="screen">
         </node>
 
@@ -186,7 +239,22 @@
           <rosparam command="load" file="$(find active-perception-experiments)/params/local_ips.yaml" />
         </node>
 
-    </group>
+        <remap from="/object_detection/detections" to="object_detection/detections"/>
+        <remap from="/object_detection/detections_image" to="object_detection/detections_image"/>
+        <remap from="/object_tracker/tracks" to="object_tracker/tracks"/>
+
+        <node name="cob_people_object_detection_detection" pkg="cob_people_object_detection_tensorflow" type="cob_people_object_detection_tensorflow.py" output="screen">
+          <env name="CUDA_VISIBLE_DEVICES" value=""/>
+          <param name="~model_name" value="gazebo_detection"/>
+          <param name="~num_of_classes" value="4"/>
+          <param name="~label_file" value="gazebo_objects.pbtxt"/>
+          <param name="~camera_namespace" value="/rescuer2/camera_cam/image_raw"/>
+          <param name="~depth_namespace" value="/camera/depth/image_raw"/>
+          <param name="~video_name" value="no"/>
+          <param name="~num_workers" value="1"/>
+        </node>
+        <include file="$(find cob_people_object_detection_tensorflow)/launch/cob_people_object_tracker.launch" />
+    </group> -->
 </launch>
 <!-- to add more UAVs (up to 10):
 Increase the id

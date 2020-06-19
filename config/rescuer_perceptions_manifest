@@ -15,6 +15,12 @@ dependencies = sensor_msgs.msg
 args = latitude, longitude, altitude
 buf = update
 
+[local_pos]
+name = mavros/local_position/pose
+msg_type = geometry_msgs/PoseStamped
+args = pose.position.x, pose.position.y, pose.position.z, pose.orientation.x,  pose.orientation.y,  pose.orientation.z,  pose.orientation.w
+buf = update
+
 [altitude]
 name = mavros/altitude
 msg_type = mavros_msgs/Altitude
@@ -32,4 +38,22 @@ buf = update
 name = /gazebo/model_states
 msg_type = gazebo_msgs/ModelStates
 args = name, pose[](position.x, position.y, position.z)
+buf = update
+
+[object_detection]
+name = object_detection/detections
+msg_type = cob_perception_msgs/DetectionArray
+args = detections[](label, id, score)
+buf = add
+
+# [object_tracker]
+# name = object_tracker/tracks
+# msg_type = cob_perception_msgs/DetectionArray
+# args = detections[](label, id, score)
+# buf = add
+
+[plan_path_result]
+name = plan_path/result
+msg_type = boustrophedon_msgs/PlanMowingPathActionResult
+args = result.plan.points[](point.x, point.y, point.z)
 buf = update

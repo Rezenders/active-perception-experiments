@@ -84,7 +84,7 @@ namespace gazebo{
           ignition::math::Pose3d modelPose = model->WorldPose();
 
           double distance = euclideanDistance(buoyPose, modelPose);
-          if(distance < 2){
+          if(distance < 2.5){
             // ros::Duration(1.5).sleep();
             gazebo_msgs::DeleteModel del_model;
             del_model.request.model_name = _msg->name.at(i);

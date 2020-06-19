@@ -6,6 +6,9 @@ setpoint_goal(0,0,0).
 !setRTLAtlitude(5).
 !setMaxSpeed(3).
 !planPath.
+// !cameraOff.
+//
+// +!cameraOff <- camera_switch(False).
 
 +!setMaxSpeed(S)
 	<- set_fcu_param("MPC_XY_VEL_MAX", 0, S).
@@ -84,8 +87,8 @@ setpoint_goal(0,0,0).
 			!defineGoal(T).
 
 +!defineGoal([])
-	<-	camera_switch(False);
-			.drop_intention(publishSetPoint).
+	<-	.drop_intention(publishSetPoint);
+			camera_switch(False).
 
 +!publishSetPoint : (mode("Fly") & state("OFFBOARD",_,"True")) | (not mode("Fly"))
 	<-	?setpoint_goal(X,Y,Z);
