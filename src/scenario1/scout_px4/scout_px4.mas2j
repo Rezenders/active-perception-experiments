@@ -1,0 +1,18 @@
+/*
+    scout_px4
+    ---------------------------
+
+    Jason Project File
+
+    This file defines the initial state of the MAS
+
+    Jason 2.5-SNAPSHOT
+    julho 03, 2020 - 16:19:39
+*/
+
+MAS scout_px4 {
+
+    infrastructure: Centralised
+
+    agents: scout agentArchClass jasonros.RosArch;
+}

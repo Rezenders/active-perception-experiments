@@ -43,12 +43,16 @@ class MockCamera:
                 agent_index = msg.name.index(self.agent_name)
                 agent_pose = msg.pose[agent_index]
 
+                self.dist = rospy.get_param(
+                                node_namespace
+                                + 'mock_camera/detection_distance')
+
                 victim_index = [index for index, model in enumerate(msg.name)
                                 if model.startswith('victim')
                                 and model not in self.victims_detected]
 
                 for index in victim_index:
-                    if calcDistance(agent_pose, msg.pose[index]) < 1.0:
+                    if calcDistance(agent_pose, msg.pose[index]) < self.dist:
                         self.victims_detected.append(msg.name[index])
                         victim_msg = std_msgs.msg.Int32()
                         victim_msg.data = victims_numer + 1

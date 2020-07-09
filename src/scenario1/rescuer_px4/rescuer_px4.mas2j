@@ -1,0 +1,18 @@
+/*
+    rescuer_px4
+    ---------------------------
+
+    Jason Project File
+
+    This file defines the initial state of the MAS
+
+    Jason 2.5-SNAPSHOT
+    julho 03, 2020 - 17:43:08
+*/
+
+MAS rescuer_px4 {
+
+    infrastructure: Centralised
+
+    agents: rescuer agentArchClass jasonros.RosArch;
+}
