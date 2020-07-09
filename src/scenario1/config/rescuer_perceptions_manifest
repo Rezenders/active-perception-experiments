@@ -8,30 +8,10 @@ dependencies = mavros_msgs.msg
 args = mode, connected, armed
 buf = update
 
-[global_pos]
-name = mavros/global_position/global
-msg_type = NavSatFix
-dependencies = sensor_msgs.msg
-args = latitude, longitude, altitude
-buf = update
-
-# [local_pos]
-# name = mavros/local_position/pose
-# msg_type = geometry_msgs/PoseStamped
-# args = pose.position.x, pose.position.y, pose.position.z, pose.orientation.x,  pose.orientation.y,  pose.orientation.z,  pose.orientation.w
-# buf = update
-
-[altitude]
-name = mavros/altitude
-msg_type = mavros_msgs/Altitude
-args = amsl
-buf = update
-
-[home_pos]
-name = mavros/home_position/home
-msg_type = HomePosition
-dependencies = mavros_msgs.msg
-args = geo.latitude, geo.longitude, geo.altitude
+[local_pos]
+name = mavros/local_position/pose
+msg_type = geometry_msgs/PoseStamped
+args = pose.position.x, pose.position.y, pose.position.z, pose.orientation.x,  pose.orientation.y,  pose.orientation.z,  pose.orientation.w
 buf = update
 
 [model_states]
@@ -42,12 +22,6 @@ buf = update
 
 [victim]
 name = mock_camera/victim_detection
-msg_type = std_msgs/Int32
-args = data
+msg_type = geometry_msgs/PoseStamped
+args = header.seq, pose.position.x, pose.position.y
 buf = add
-
-# [plan_path_result]
-# name = plan_path/result
-# msg_type = boustrophedon_msgs/PlanMowingPathActionResult
-# args = result.plan.points[](point.x, point.y, point.z)
-# buf = update

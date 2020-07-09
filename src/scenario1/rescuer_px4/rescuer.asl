@@ -1,10 +1,13 @@
 /* Initial beliefs and rules */
 mode("land").
 flight_altitude(2).
+setpoint_goal(0, 0, 0).
 
 /* Initial goals */
+!getGazeboOffset.
 !setRTLAtlitude(3).
-!startPublishingSetPoints.
+// !startPublishingSetPoints.
+!publishSetPoint.
 
 /* Plans */
 +!setMaxSpeed(S)
@@ -14,23 +17,20 @@ flight_altitude(2).
   <-  set_fcu_param("RTL_RETURN_ALT", 0, A);
       set_fcu_param("RTL_DESCEND_ALT", 0, A-0.5).
 
-+!startPublishingSetPoints
-  <-  .wait(home_pos(HLat, HLong, _));
-      ?home_pos(HLat, HLong, _);
-      -+setpoint_goal(HLat, HLong, 0);
-      !!publishSetPoint.
+//TIRAR ESSE PLANO
+// +!startPublishingSetPoints
+//   <-  !!publishSetPoint.
 
-+victim_in_need(N, Lat, Long)[lu(HH,MM,SS,MS)]
-	<-	+victim_position(N, Lat, Long)[ap(100),lu(HH,MM,SS,MS)];
++victim_in_need(N, GX, GY)[lu(HH,MM,SS,MS)]
+	<-	+victim_position(N, GX, GY)[ap(100),lu(HH,MM,SS,MS)];
       !start_negotiation.
 
-+victim(ID)
-  <-  ?global_pos(Lat, Long, _);
-      .time(HH,MM,SS,MS);
-      ?victim_in_rescue(N, Lat2, Long2);
++victim(ID, _, _)
+  <-  .time(HH,MM,SS,MS);
+      ?victim_in_rescue(N, GX, GY);
       .abolish(victim_position(N, _, _));
       .print("DETECTED VICTIM");
-      +victim_position(N, Lat, Long)[ap(500),lu(HH,MM,SS,MS)].
+      +victim_position(N, GX, GY)[ap(500),lu(HH,MM,SS,MS)].
 
 +!start_negotiation: .desire(negotiate) | .desire(rescueVictim)
 	<- 	.suspend;
@@ -41,10 +41,10 @@ flight_altitude(2).
 	<- !negotiate.
 
 +!negotiate
-	<-	.findall([N, Lat, Long], victim_in_need(N,Lat,Long)[lu(HH,MM,SS,MS)], V);
+	<-	.findall([N, GX, GY], victim_in_need(N,GX,GY)[lu(HH,MM,SS,MS)], V);
 			.sort(V, SV);
 			.nth(0, SV, Next);
-			Next = [N, Lat, Long];
+			Next = [N, GX, GY];
 
 			!propose(N);
 			.findall([O, Me], propose(Me, N, O), L);
@@ -74,10 +74,10 @@ flight_altitude(2).
 
 +!check_winner(N, Who): .my_name(Me) & Me == Who
 	<-	.print("I am responsible for rescuing victim ", N);
-			?victim_in_need(N, Lat, Long);
+			?victim_in_need(N, GX, GY);
       .abolish(victim_in_need(N, _, _));
-      +victim_in_rescue(N, Lat, Long);
-			.broadcast(achieve, mark_as_rescued(N, Lat, Long));
+      +victim_in_rescue(N, GX, GY);
+			.broadcast(achieve, mark_as_rescued(N, GX, GY));
       .resume(publishSetPoint);
 			!!rescueVictim.
 
@@ -88,13 +88,13 @@ flight_altitude(2).
 	<- 	.wait(1000);
       -+mode("Fly");
       !setMaxSpeed(12);
-      ?victim_in_rescue(N, Lat, Long);
-      !defineGoal([[Lat, Long,_]]);
+      ?victim_in_rescue(N, GX, GY);
+      !defineGoalLocal([[GX, GY,_]]);
       !drop_buoy(N);
       -victim_in_rescue(N, _, _);
 			!resume_negotiation.
 
-+!drop_buoy(N): victim_position(N, Lat, Long)[ap(500)]
++!drop_buoy(N): victim_position(N, _, _)[ap(500)]
   <-  ?flight_altitude(Z);
       !getGazeboPos;
       ?gazebo_pos(GX, GY, GZ);
@@ -107,46 +107,34 @@ flight_altitude(2).
   <-  .print("Victim ", N, " not found");
       .broadcast(tell, victim_drowned(N)).
 
-+?victim_position(N, Lat, Long)[ap(T)]
++?victim_position(N, _, _)[ap(T)]
   <-  .print("Active perception for victim ", N," !!!!!!!!!!!!!!!!!!!!!!!!!!!");
       camera_switch(True);
-      .wait(2000);
+      .wait(1000);
       camera_switch(False);
       .
 
 +!resume_negotiation: .intend(start_negotiation)
   <-  .resume(start_negotiation).
 
-// +!resume_negotiation <- !returnHome.
 +!resume_negotiation <- .suspend(publishSetPoint).
 
-+!mark_as_rescued(N, Lat, Long)
-	<- .abolish(victim_in_need(N,Lat,Long)).
++!mark_as_rescued(N, GX, GY)
+	<- .abolish(victim_in_need(N, GX, GY)).
 
-+!defineGoal([H|T])
++!defineGoalLocal([H|T])
 	<- 	H = [X, Y, _];
 			?flight_altitude(Z);
-      ?altitude(A);
-      ?global_pos(_,_,GZ);
-      ?home_pos(_,_,HA);
-			-+setpoint_goal(X, Y, HA - (GZ-A) + Z);
-			.wait(global_pos(X2,Y2,Z2) & math.abs(X2 -(X)) <=0.00001 & math.abs(Y2 -(Y)) <=0.00001);
-			!defineGoal(T).
+      ?gazebo_offset(OX, OY, OZ);
+			-+setpoint_goal(X - OX, Y - OY, Z - OZ);
+			.wait(local_pos(X2,Y2,Z2,_,_,_,_) & math.abs(X2+OX -(X)) <=0.5 & math.abs(Y2 +OY -(Y)) <=0.5 & math.abs(Z2 + OZ -(Z)) <=0.5);
+			!defineGoalLocal(T).
 
-+!defineGoal([]).
-
-// +!defineGoalLocal([H|T])
-// 	<- 	H = [X, Y, _];
-// 			?flight_altitude(Z);
-// 			-+setpoint_goal(X,Y,Z);
-// 			.wait(local_pos(X2,Y2,Z2,_,_,_,_) & math.abs(X2 -(X)) <=0.5 & math.abs(Y2 -(Y)) <=0.5 & math.abs(Z2 -(Z)) <=0.5);
-// 			!defineGoalLocal(T).
-//
-// +!defineGoalLocal([]).
++!defineGoalLocal([]).
 
 +!publishSetPoint : (mode("Fly") & state("OFFBOARD",_,"True")) | (mode("land"))
 	<-	?setpoint_goal(X,Y,Z);
-			setpoint_global(X,Y,Z);
+			setpoint_local(X,Y,Z);
 			.wait(100);
 			!publishSetPoint.
 
@@ -154,15 +142,9 @@ flight_altitude(2).
 	<-	arm_motors(True);
 			set_mode("OFFBOARD");
 			?setpoint_goal(X,Y,Z);
-			setpoint_global(X,Y,Z);
+			setpoint_local(X,Y,Z);
 			.wait(100);
 			!publishSetPoint.
-
-// +!publishSetPoint : mode("scout")
-// 	<-	?setpoint_goal(X,Y,Z);
-// 			setpoint_local(X,Y,Z);
-// 			.wait(100);
-// 			!publishSetPoint.
 
 +!publishSetPoint <- !publishSetPoint.
 
@@ -170,14 +152,13 @@ flight_altitude(2).
   <-  .suspend(publishSetPoint);
       !setMaxSpeed(12);
       -+mode("land");
-      ?home_pos(X2,Y2,Z2);
-      -+setpoint_goal(X2, Y2, Z2);
-      .wait(global_pos(X,Y,Z) & math.abs(X2 -(X)) <=0.00001 & math.abs(Y2 -(Y)) <=0.00001 & math.abs(Z2 -(Z)) <= 0.1);
+      .wait(local_pos(X,Y,Z,_,_,_,_) & X <=0.5 & Y <=0.5 & Z <= 0.2);
       .print("Landed! beginning charging and buoy replacement!");
       .wait(1000).
 
 +!getGazeboPos
-  <-  ?model_states(Models, Poses);
+  <-  .wait(model_states(_,_));
+      ?model_states(Models, Poses);
       .length(Models, Length);
       for(.range(I, 0, Length-1)){
         .nth(I, Models, Model); .term2string(Model, SModel);
@@ -190,10 +171,16 @@ flight_altitude(2).
         }
       }.
 
-+!setMode(Mode) : not state(Mode,_,_)
-  <-  set_mode(Mode);
-      !setMode(Mode).
++!getGazeboOffset
+  <-  !getGazeboPos;
+      ?gazebo_pos(GX, GY, GZ);
+      ?local_pos(LX, LY, LZ, _, _, _, _);
+      +gazebo_offset(GX-LX, GY-LY, GZ-LZ).
 
-+!setMode(Mode).
+// +!setMode(Mode) : not state(Mode,_,_)
+//   <-  set_mode(Mode);
+//       !setMode(Mode).
+//
+// +!setMode(Mode).
 
 {apply_ap}

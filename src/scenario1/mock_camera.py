@@ -3,6 +3,7 @@ import rospy
 import gazebo_msgs.msg
 import std_msgs.msg
 import std_srvs.srv
+import geometry_msgs.msg
 
 
 def calcDistance(agentPose, victimPose):
@@ -14,7 +15,8 @@ class MockCamera:
     def __init__(self):
         self.victim_pub = rospy.Publisher(
             'mock_camera/victim_detection',
-            std_msgs.msg.Int32,
+            # std_msgs.msg.Int32,
+            geometry_msgs.msg.PoseStamped,
             queue_size=5,
             latch=True
         )
@@ -54,8 +56,10 @@ class MockCamera:
                 for index in victim_index:
                     if calcDistance(agent_pose, msg.pose[index]) < self.dist:
                         self.victims_detected.append(msg.name[index])
-                        victim_msg = std_msgs.msg.Int32()
-                        victim_msg.data = victims_numer + 1
+                        # victim_msg = std_msgs.msg.Int32()
+                        # victim_msg.data = victims_numer + 1
+                        victim_msg = geometry_msgs.msg.PoseStamped()
+                        victim_msg.pose = msg.pose[index]
                         self.victim_pub.publish(victim_msg)
             except KeyError:
                 pass

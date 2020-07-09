@@ -1,5 +1,3 @@
-// Agent sample_agent in project scout_px4
-
 /* Initial beliefs and rules */
 water_y_offset(12.5).
 search_area(12).
@@ -12,7 +10,6 @@ setpoint_goal(0,0,0).
 !planPath.
 
 /* Plans */
-
 +!setMaxSpeed(S)
 	<- set_fcu_param("MPC_XY_VEL_MAX", 0, S).
 
@@ -58,35 +55,28 @@ setpoint_goal(0,0,0).
 			.wait(100);
 			!publishSetPoint.
 
-+victim(ID)
-	<-	?global_pos(Lat, Long, _);
-			+victim_position(ID, Lat, Long).
++victim(ID, GX, GY)
+	<-	+victim_position(ID, GX, GY).
 
-+victim_position(ID, Lat, Long)
++victim_position(ID, GX, GY)
 	<-	.resume(contactRescuers).
 
 +!contactRescuers: victim_position(_, _, _)
- 	<- 	.findall([ID, Lat, Long], victim_position(ID, Lat, Long), VLIST);
+ 	<- 	.findall([ID, GX, GY], victim_position(ID, GX, GY), VLIST);
 			!informVictim(VLIST);
 			!contactRescuers.
 
 +!contactRescuers <- .suspend; !contactRescuers.
 
 +!informVictim([H|T])
-	<- 	 H = [ID, Lat, Long]
+	<- 	 H = [ID, GX, GY]
 			.print("Victim ", H);
 			.time(HH,MM,SS,MS);
-			.broadcast(tell, victim_in_need(ID, Lat, Long)[lu(HH,MM,SS,MS)]);
-			-victim_position(ID, Lat, Long);
+			.broadcast(tell, victim_in_need(ID, GX, GY)[lu(HH,MM,SS,MS)]);
+			-victim_position(ID, _, _);
 			.wait(500);
 			!informVictim(T).
 
 +!informVictim([]).
 
-+!mark_as_rescued(N, Lat, Long).
-
-+!land : not state("AUTO.RTL",_,_)
-	<- 	set_mode("AUTO.RTL");
-			!land.
-
-+!land.
++!mark_as_rescued(_, _, _).
