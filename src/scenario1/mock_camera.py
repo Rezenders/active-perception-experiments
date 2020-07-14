@@ -54,7 +54,9 @@ class MockCamera:
                                 and model not in self.victims_detected]
 
                 for index in victim_index:
-                    if calcDistance(agent_pose, msg.pose[index]) < self.dist:
+                    if calcDistance(agent_pose, msg.pose[index]) < self.dist \
+                     and msg.pose[index].position.z >= 0:
+
                         self.victims_detected.append(msg.name[index])
                         # victim_msg = std_msgs.msg.Int32()
                         # victim_msg.data = victims_numer + 1

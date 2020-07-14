@@ -1,25 +1,22 @@
 /* Initial beliefs and rules */
-mode("land").
 flight_altitude(2).
 setpoint_goal(0, 0, 0).
 
 /* Initial goals */
 !getGazeboOffset.
-!setRTLAtlitude(3).
-// !startPublishingSetPoints.
-!publishSetPoint.
+!setRTLAtlitude(3.0).
 
 /* Plans */
-+!setMaxSpeed(S)
-  <- set_fcu_param("MPC_XY_VEL_MAX", 0, S).
++!setMaxSpeed(S) : state(_,"True",_)
+  <-  set_fcu_param("MPC_XY_VEL_MAX", 0, S).
 
-+!setRTLAtlitude(A)
++!setMaxSpeed(S) <- !setMaxSpeed(S).
+
++!setRTLAtlitude(A) : state(_,"True",_)
   <-  set_fcu_param("RTL_RETURN_ALT", 0, A);
       set_fcu_param("RTL_DESCEND_ALT", 0, A-0.5).
 
-//TIRAR ESSE PLANO
-// +!startPublishingSetPoints
-//   <-  !!publishSetPoint.
++!setRTLAtlitude(A) <- !setRTLAtlitude(A).
 
 +victim_in_need(N, GX, GY)[lu(HH,MM,SS,MS)]
 	<-	+victim_position(N, GX, GY)[ap(100),lu(HH,MM,SS,MS)];
@@ -41,7 +38,7 @@ setpoint_goal(0, 0, 0).
 	<- !negotiate.
 
 +!negotiate
-	<-	.findall([N, GX, GY], victim_in_need(N,GX,GY)[lu(HH,MM,SS,MS)], V);
+	<-	.findall([N, GX, GY], victim_in_need(N, GX, GY)[lu(HH,MM,SS,MS)], V);
 			.sort(V, SV);
 			.nth(0, SV, Next);
 			Next = [N, GX, GY];
@@ -55,8 +52,8 @@ setpoint_goal(0, 0, 0).
 +!propose(N)
 	<- 	.random(R);
       .my_name(Me);
-			+propose(Me, N, R);
-			!broadcastProposal(10, Me, N, R).
+			+propose(Me, N, R*100);
+			!broadcastProposal(10, Me, N, R*100).
 
 +!broadcastProposal(I, Me, N, R) : I>0
   <-  .broadcast(tell, propose(Me, N, R));
@@ -77,22 +74,47 @@ setpoint_goal(0, 0, 0).
 			?victim_in_need(N, GX, GY);
       .abolish(victim_in_need(N, _, _));
       +victim_in_rescue(N, GX, GY);
-			.broadcast(achieve, mark_as_rescued(N, GX, GY));
-      .resume(publishSetPoint);
+      !!publishSetPoint;
 			!!rescueVictim.
 
 +!check_winner(N, Who)
-	<- 	.print("Not selected!").
+	<- 	.abolish(victim_in_need(N, _, _));
+      .print("Not selected to rescue victim ", N).
 
 +!rescueVictim
 	<- 	.wait(1000);
-      -+mode("Fly");
-      !setMaxSpeed(12);
       ?victim_in_rescue(N, GX, GY);
       !defineGoalLocal([[GX, GY,_]]);
       !drop_buoy(N);
       -victim_in_rescue(N, _, _);
 			!resume_negotiation.
+
++!publishSetPoint : state("OFFBOARD",_,"True")
+	<-	?setpoint_goal(X,Y,Z);
+			setpoint_local(X,Y,Z);
+			.wait(200);
+			!publishSetPoint.
+
++!publishSetPoint : not state("OFFBOARD",_,"True")
+	<-	arm_motors(True);
+			set_mode("OFFBOARD");
+			?setpoint_goal(X,Y,Z);
+			setpoint_local(X,Y,Z);
+			.wait(200);
+			!publishSetPoint.
+
++!publishSetPoint <- !publishSetPoint.
+
++!defineGoalLocal([H|T])
+	<- 	H = [X, Y, _];
+			?flight_altitude(Z);
+      .wait(gazebo_offset(_, _, _));
+      ?gazebo_offset(OX, OY, OZ);
+			-+setpoint_goal(X - OX, Y - OY, Z - OZ);
+			.wait(local_pos(X2,Y2,Z2,_,_,_,_) & math.abs(X2+OX -(X)) <=0.7 & math.abs(Y2 +OY -(Y)) <=0.7 & math.abs(Z2 + OZ -(Z)) <=0.7);
+			!defineGoalLocal(T).
+
++!defineGoalLocal([]).
 
 +!drop_buoy(N): victim_position(N, _, _)[ap(500)]
   <-  ?flight_altitude(Z);
@@ -117,48 +139,17 @@ setpoint_goal(0, 0, 0).
 +!resume_negotiation: .intend(start_negotiation)
   <-  .resume(start_negotiation).
 
-+!resume_negotiation <- .suspend(publishSetPoint).
-
-+!mark_as_rescued(N, GX, GY)
-	<- .abolish(victim_in_need(N, GX, GY)).
-
-+!defineGoalLocal([H|T])
-	<- 	H = [X, Y, _];
-			?flight_altitude(Z);
-      ?gazebo_offset(OX, OY, OZ);
-			-+setpoint_goal(X - OX, Y - OY, Z - OZ);
-			.wait(local_pos(X2,Y2,Z2,_,_,_,_) & math.abs(X2+OX -(X)) <=0.5 & math.abs(Y2 +OY -(Y)) <=0.5 & math.abs(Z2 + OZ -(Z)) <=0.5);
-			!defineGoalLocal(T).
-
-+!defineGoalLocal([]).
-
-+!publishSetPoint : (mode("Fly") & state("OFFBOARD",_,"True")) | (mode("land"))
-	<-	?setpoint_goal(X,Y,Z);
-			setpoint_local(X,Y,Z);
-			.wait(100);
-			!publishSetPoint.
-
-+!publishSetPoint : mode("Fly") & not state("OFFBOARD",_,"True")
-	<-	arm_motors(True);
-			set_mode("OFFBOARD");
-			?setpoint_goal(X,Y,Z);
-			setpoint_local(X,Y,Z);
-			.wait(100);
-			!publishSetPoint.
-
-+!publishSetPoint <- !publishSetPoint.
++!resume_negotiation <- .drop_intention(publishSetPoint).
 
 +!returnHome
-  <-  .suspend(publishSetPoint);
-      !setMaxSpeed(12);
-      -+mode("land");
+  <-  .drop_intention(publishSetPoint);
+      -+setpoint_goal(0,0,0);
       .wait(local_pos(X,Y,Z,_,_,_,_) & X <=0.5 & Y <=0.5 & Z <= 0.2);
       .print("Landed! beginning charging and buoy replacement!");
       .wait(1000).
 
 +!getGazeboPos
-  <-  .wait(model_states(_,_));
-      ?model_states(Models, Poses);
+  <-  ?model_states(Models, Poses);
       .length(Models, Length);
       for(.range(I, 0, Length-1)){
         .nth(I, Models, Model); .term2string(Model, SModel);
@@ -177,10 +168,6 @@ setpoint_goal(0, 0, 0).
       ?local_pos(LX, LY, LZ, _, _, _, _);
       +gazebo_offset(GX-LX, GY-LY, GZ-LZ).
 
-// +!setMode(Mode) : not state(Mode,_,_)
-//   <-  set_mode(Mode);
-//       !setMode(Mode).
-//
-// +!setMode(Mode).
+-!getGazeboOffset <- !getGazeboOffset.
 
 {apply_ap}

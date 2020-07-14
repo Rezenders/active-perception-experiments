@@ -1,17 +1,17 @@
 /* Initial beliefs and rules */
 water_y_offset(12.5).
-search_area(12).
+search_area(13).
 flight_altitude(3).
 setpoint_goal(0,0,0).
 
 /* Initial goals */
-!setRTLAtlitude(5).
-!setMaxSpeed(3).
+!setRTLAtlitude(5.0).
+!setMaxSpeed(6).
 !planPath.
 
 /* Plans */
 +!setMaxSpeed(S)
-	<- set_fcu_param("MPC_XY_VEL_MAX", 0, S).
+	<- 	set_fcu_param("MPC_XY_VEL_MAX", 0, S).
 
 +!setRTLAtlitude(A)
 	<- 	set_fcu_param("RTL_RETURN_ALT", 0, A).
@@ -26,7 +26,6 @@ setpoint_goal(0,0,0).
 	<-	camera_switch(True);
 			!!publishSetPoint;
 			.wait(2000);
-			+mode("Fly");
 			!!contactRescuers;
 			!defineGoal(PLIST).
 
@@ -35,24 +34,24 @@ setpoint_goal(0,0,0).
 	<- 	H = [X, Y, _];
 			?flight_altitude(Z);
 			-+setpoint_goal(X,Y,Z);
-			.wait(local_pos(X2,Y2,Z2,_,_,_,_) & math.abs(X2 -(X)) <=0.5 & math.abs(Y2 -(Y)) <=0.5 & math.abs(Z2 -(Z)) <=0.5);
+			.wait(local_pos(X2,Y2,Z2,_,_,_,_) & math.abs(X2 -(X)) <=0.7 & math.abs(Y2 -(Y)) <=0.7 & math.abs(Z2 -(Z)) <=0.7);
 			!defineGoal(T).
 
 +!defineGoal([])
 	<-	.drop_intention(publishSetPoint).
 
-+!publishSetPoint : (mode("Fly") & state("OFFBOARD",_,"True")) | (not mode("Fly"))
++!publishSetPoint : state("OFFBOARD",_,"True")
 	<-	?setpoint_goal(X,Y,Z);
 			setpoint_local(X,Y,Z);
-			.wait(100);
+			.wait(200);
 			!publishSetPoint.
 
-+!publishSetPoint : mode("Fly") & not state("OFFBOARD",_,"True")
++!publishSetPoint : not state("OFFBOARD",_,"True")
 	<-	arm_motors(True);
 			set_mode("OFFBOARD");
 			?setpoint_goal(X,Y,Z);
 			setpoint_local(X,Y,Z);
-			.wait(100);
+			.wait(200);
 			!publishSetPoint.
 
 +victim(ID, GX, GY)
@@ -78,5 +77,3 @@ setpoint_goal(0,0,0).
 			!informVictim(T).
 
 +!informVictim([]).
-
-+!mark_as_rescued(_, _, _).
