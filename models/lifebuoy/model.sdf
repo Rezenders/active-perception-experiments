@@ -4,6 +4,9 @@
    <!-- <static>true</static> -->
     <link name="body">
       <!-- <pose>0 0 0.067 0 0 0</pose> -->
+      <inertial>
+        <mass>30.0</mass>
+      </inertial>
 
       <visual name="visual">
         <geometry>
@@ -27,6 +30,11 @@
             <scale>0.01 0.01 0.01</scale>
           </mesh>
         </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+          </bounce>
+        </surface>
       </collision>
 
     </link>
