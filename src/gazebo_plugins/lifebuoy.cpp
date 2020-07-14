@@ -11,7 +11,8 @@
 #include "gazebo_msgs/ModelStates.h"
 #include "gazebo_msgs/DeleteModel.h"
 #include "geometry_msgs/Pose.h"
-#include "std_msgs/String.h"
+// #include "std_msgs/String.h"
+#include "std_msgs/Bool.h"
 
 #include <iostream>
 #include <math.h>
@@ -29,7 +30,6 @@ namespace gazebo{
     physics::ModelPtr model;
 
     std::unique_ptr<ros::NodeHandle> rosNode;
-    ros::Publisher buoyHandlePub;
 
     ros::Subscriber rosSub;
     ros::CallbackQueue rosQueue;
@@ -62,7 +62,6 @@ namespace gazebo{
         return;
       }
       this->rosNode.reset(new ros::NodeHandle("buoy"));
-      buoyHandlePub = rosNode->advertise<std_msgs::String>("/rescue_world/delete_model", 1);
 
       ros::SubscribeOptions so =
         ros::SubscribeOptions::create<gazebo_msgs::ModelStates>(
@@ -80,19 +79,17 @@ namespace gazebo{
     void OnRosMsg(const gazebo_msgs::ModelStatesConstPtr &_msg){
       for (size_t i = 0; i < _msg->name.size(); i++) {
         if(_msg->name.at(i).compare(0, 6,"victim") == 0){
-          geometry_msgs::Pose buoyPose = _msg->pose.at(i);
-          ignition::math::Pose3d modelPose = model->WorldPose();
+          geometry_msgs::Pose victimPose = _msg->pose.at(i);
+          ignition::math::Pose3d buoyPose = model->WorldPose();
 
-          double distance = euclideanDistance(buoyPose, modelPose);
+          double distance = euclideanDistance(victimPose, buoyPose);
           if(distance < 2.5){
-            // ros::Duration(1.5).sleep();
-            gazebo_msgs::DeleteModel del_model;
-            del_model.request.model_name = _msg->name.at(i);
-            ros::service::call("/gazebo/delete_model", del_model);
+            ros::Publisher victimPub;
+            victimPub = rosNode->advertise<std_msgs::Bool>("/victim/"+_msg->name.at(i), 1);
 
-            std_msgs::String del_model2;
-            del_model2.data = model->GetName();
-            buoyHandlePub.publish(del_model2);
+            std_msgs::Bool pubMsg;
+            pubMsg.data = false;
+            victimPub.publish(pubMsg);
 
             i = _msg->name.size();
           }
