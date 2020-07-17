@@ -115,14 +115,14 @@
             <arg name="tgt_component" value="1"/>
         </include>
 
-        <arg name="agent_path" default="$(find active-perception-experiments)/src/scenario1/rescuer_px4"/>
+        <arg name="agent_path" default="$(find active-perception-experiments)/src/scenario1/rescuer_px4_ap"/>
         <arg name="actions_manifest" default="$(find active-perception-experiments)/src/scenario1/config/actions_manifest"/>
         <arg name="perceptions_manifest" default="$(find active-perception-experiments)/src/scenario1/config/rescuer_perceptions_manifest"/>
 
         <node name="jason_hw_bridge" pkg="jason_ros" type="hw_bridge.py"
           args="-a $(arg actions_manifest) -p $(arg perceptions_manifest)"/>
 
-        <node name="jason_agent" pkg="jason_ros" type="gradle_start_new_mas2j.sh"
+        <node name="jason_agent" pkg="active-perception-experiments" type="gradle_start_new_mas2j_ap.sh"
           args="$(arg agent_path) $(arg rescuer1) rescuer.asl" output="screen">
         </node>
 
@@ -161,14 +161,14 @@
             <arg name="tgt_component" value="1"/>
         </include>
 
-        <arg name="agent_path" default="$(find active-perception-experiments)/src/scenario1/rescuer_px4"/>
+        <arg name="agent_path" default="$(find active-perception-experiments)/src/scenario1/rescuer_px4_ap"/>
         <arg name="actions_manifest" default="$(find active-perception-experiments)/src/scenario1/config/actions_manifest"/>
         <arg name="perceptions_manifest" default="$(find active-perception-experiments)/src/scenario1/config/rescuer_perceptions_manifest"/>
 
         <node name="jason_hw_bridge" pkg="jason_ros" type="hw_bridge.py"
           args="-a $(arg actions_manifest) -p $(arg perceptions_manifest)"/>
 
-        <node name="jason_agent" pkg="jason_ros" type="gradle_start_new_mas2j.sh"
+        <node name="jason_agent" pkg="active-perception-experiments" type="gradle_start_new_mas2j_ap.sh"
           args="$(arg agent_path) $(arg rescuer2) rescuer.asl" output="screen">
         </node>
 
