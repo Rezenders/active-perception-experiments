@@ -6,15 +6,16 @@
         <pose>0 -21.555550 5.573201 0 0.169398 1.5708</pose>
       </camera>
     </gui>
-
+    <scene>
+      <grid>false</grid>
+    </scene>
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
     </include>
 
-    <!-- <include> -->
     <model name="water_level">
-    <pose>0 62.5 0 0 0 0</pose>
+    <pose>0 52.5 0 0 0 0</pose>
     <link name="link">
       <visual name="visual">
         <geometry>
@@ -35,13 +36,13 @@
     </model>
 
     <model name="grass_plane">
-    <pose>0 0 0 0 0 0</pose>
+    <pose>0 -22.5 0 0 0 0</pose>
     <link name="link">
       <visual name="visual">
         <geometry>
           <plane>
             <normal>0 0 1</normal>
-            <size>100 25</size>
+            <size>100 50</size>
           </plane>
         </geometry>
         <material>
@@ -55,7 +56,7 @@
         <geometry>
           <plane>
             <normal>0 0 1</normal>
-            <size>100 25</size>
+            <size>100 50</size>
           </plane>
         </geometry>
       </collision>
@@ -87,62 +88,38 @@
 
     <include>
       <name>victim_randy</name>
-      <pose>7 17.5 0.1 -1.57 0 0</pose>
+      <pose>7 10 0.1 -1.57 0 0</pose>
       <uri>model://rescue_randy</uri>
-      <plugin name="victim" filename="libvictim.so">
-        <drowningTime>85000</drowningTime>
-      </plugin>
     </include>
 
     <include>
       <name>victim_scrubs</name>
-      <pose>-7 15.5 0.1 -1.57 0 0</pose>
+      <pose>-7 5.5 0.1 -1.57 0 0</pose>
       <uri>model://OpScrubs</uri>
-      <!-- <static>false</static>
-      <gravity>0</gravity> -->
-      <plugin name="victim" filename="libvictim.so">
-        <drowningTime>70000</drowningTime>
-      </plugin>
     </include>
 
     <include>
       <name>victim_survivorf</name>
-      <pose>0 16.5 0 0 0 0</pose>
+      <pose>0 6.5 0 0 0 0</pose>
       <uri>model://Survivor Female</uri>
-      <!-- <static>false</static>
-      <gravity>0</gravity> -->
-      <plugin name="victim" filename="libvictim.so">
-        <drowningTime>75000</drowningTime>
-      </plugin>
     </include>
 
     <include>
       <name>victim_person</name>
-      <pose>0 20.5 0.1 0 0 0</pose>
+      <pose>0 10.5 0.1 0 0 0</pose>
       <uri>model://Survivor Male</uri>
-      <!-- <static>false</static>
-      <gravity>0</gravity> -->
-      <plugin name="victim" filename="libvictim.so">
-        <drowningTime>90000</drowningTime>
-      </plugin>
     </include>
 
     <include>
       <name>victim5</name>
-      <pose>-7 21.5 0.1 -1.57 0 -0.57</pose>
+      <pose>-7 11.5 0.1 -1.57 0 -0.57</pose>
       <uri>model://rescue_randy</uri>
-      <plugin name="victim" filename="libvictim.so">
-        <drowningTime>70000</drowningTime>
-      </plugin>
     </include>
 
     <include>
       <name>victim6</name>
-      <pose>10 16.5 0 0 0 0.97</pose>
+      <pose>10 6.5 0 0 0 0.97</pose>
       <uri>model://Survivor Female</uri>
-      <plugin name="victim" filename="libvictim.so">
-        <drowningTime>1000000</drowningTime>
-      </plugin>
     </include>
 
     <!-- <include>
