@@ -1,5 +1,5 @@
 /* Initial beliefs and rules */
-water_y_offset(12.5).
+water_y_offset(2.5).
 search_area(13).
 flight_altitude(3).
 setpoint_goal(0,0,0).
@@ -77,3 +77,5 @@ setpoint_goal(0,0,0).
 			!informVictim(T).
 
 +!informVictim([]).
+
++!mark_as_rescued(N, Lat, Long).

@@ -22,6 +22,13 @@ setpoint_goal(0, 0, 0).
 	<-	+victim_position(N, GX, GY)[ap(100),lu(HH,MM,SS,MS)];
       !start_negotiation.
 
++victim(ID, _, _)
+  <-  .time(HH,MM,SS,MS);
+      ?victim_in_rescue(N, GX, GY);
+      .abolish(victim_position(N, _, _));
+      .print("DETECTED VICTIM");
+      +victim_position(N, GX, GY)[ap(5000),lu(HH,MM,SS,MS)].
+
 +!start_negotiation: .desire(negotiate) | .desire(rescueVictim)
 	<- 	.suspend;
 			!!start_negotiation.
@@ -111,7 +118,7 @@ setpoint_goal(0, 0, 0).
 
 +!defineGoalLocal([]).
 
-+!drop_buoy(N)
++!drop_buoy(N): victim_position(N, _, _)[ap(5000)]
   <-  ?flight_altitude(Z);
       !getGazeboPos;
       ?gazebo_pos(GX, GY, GZ);
@@ -119,6 +126,17 @@ setpoint_goal(0, 0, 0).
       .print("Droping buoy to victim ", N);
       .broadcast(tell, victim_rescued(N));
       !returnHome.
+
++!drop_buoy(N)
+  <-  .print("Victim ", N, " not found");
+      .broadcast(tell, victim_drowned(N)).
+
++?victim_position(N, _, _)[ap(T)]
+  <-  .print("Active perception for victim ", N," !!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      camera_switch(True);
+      .wait(1000);
+      camera_switch(False);
+      .
 
 +!resume_negotiation: .intend(start_negotiation)
   <-  .drop_intention(publishSetPoint);
@@ -157,3 +175,5 @@ setpoint_goal(0, 0, 0).
 
 +!mark_as_rescued(N, Lat, Long)
 	<- .abolish(victim_in_need(N,Lat,Long)).
+
+{apply_ap}
