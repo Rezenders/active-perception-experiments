@@ -10,6 +10,6 @@
     -p $(find active-perception-experiments)/config/perceptions_manifest"/>
 
   <node name="jason_agent" pkg="jason_ros" type="gradle_starter.sh"
-    args="$(find active-perception-experiments)/src/uav_ap/build.gradle"/>
+    args="$(find active-perception-experiments)/src/ardupilot/uav_ap/build.gradle"/>
 
 </launch>

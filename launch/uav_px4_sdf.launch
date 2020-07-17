@@ -39,7 +39,7 @@
       <arg name="respawn_mavros" value="$(arg respawn_mavros)"/>
   </include>
 
-  <arg name="agent_path" default="$(find active-perception-experiments)/src/scout_px4"/>
+  <arg name="agent_path" default="$(find active-perception-experiments)/src/camera_scenarios/scout_px4"/>
   <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
   <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/perceptions_manifest"/>
 

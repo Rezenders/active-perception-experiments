@@ -6,9 +6,6 @@ setpoint_goal(0,0,0).
 !setRTLAtlitude(5).
 !setMaxSpeed(3).
 !planPath.
-// !cameraOff.
-//
-// +!cameraOff <- camera_switch(False).
 
 +!setMaxSpeed(S)
 	<- set_fcu_param("MPC_XY_VEL_MAX", 0, S).
@@ -103,21 +100,5 @@ setpoint_goal(0,0,0).
 			setpoint_local(X,Y,Z);
 			.wait(100);
 			!publishSetPoint.
-
-+!armMotor : not state(_,_,"True")
-	<-	arm_motors(True);
-			.wait(state(_,_,"True"), 500).
-
-+!armMotor.
-
--!armMotor <- !armMotor.
-
-+!setMode(Mode) : not state(Mode,_,_)
-	<- 	set_mode(Mode);
-			.wait(state(Mode,_,_), 200).
-
-+!setMode(Mode).
-
--!setMode(Mode) <- !setMode(Mode).
 
 +!mark_as_rescued(N, Lat, Long).

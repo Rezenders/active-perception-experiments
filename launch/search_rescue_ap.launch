@@ -72,7 +72,7 @@
             <param name="publish_path_points" value="true"/>
         </node>
 
-        <arg name="agent_path" default="$(find active-perception-experiments)/src/scout_px4"/>
+        <arg name="agent_path" default="$(find active-perception-experiments)/src/camera_scenarios/scout_px4"/>
         <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
         <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/scout_perceptions_manifest"/>
 
@@ -148,7 +148,7 @@
             <param name="publish_path_points" value="true"/>
         </node>
 
-        <arg name="agent_path" default="$(find active-perception-experiments)/src/rescuer_px4_ap"/>
+        <arg name="agent_path" default="$(find active-perception-experiments)/src/camera_scenarios/rescuer_px4_ap"/>
         <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
         <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/rescuer_perceptions_manifest"/>
 
@@ -224,7 +224,7 @@
             <param name="publish_path_points" value="true"/>
         </node>
 
-        <arg name="agent_path" default="$(find active-perception-experiments)/src/rescuer_px4_ap"/>
+        <arg name="agent_path" default="$(find active-perception-experiments)/src/camera_scenarios/rescuer_px4_ap"/>
         <arg name="actions_manifest" default="$(find active-perception-experiments)/config/actions_manifest"/>
         <arg name="perceptions_manifest" default="$(find active-perception-experiments)/config/rescuer_perceptions_manifest"/>
 
