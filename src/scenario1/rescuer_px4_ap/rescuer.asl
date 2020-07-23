@@ -19,7 +19,7 @@ setpoint_goal(0, 0, 0).
 +!setRTLAtlitude(A) <- !setRTLAtlitude(A).
 
 +victim_in_need(N, GX, GY)[lu(HH,MM,SS,MS)]
-	<-	+victim_position(N, GX, GY)[ap(100),lu(HH,MM,SS,MS)];
+	<-	+victim_position(N, GX, GY)[ap(_),lu(HH,MM,SS,MS)];
       !start_negotiation.
 
 +victim(ID, _, _)
@@ -27,7 +27,7 @@ setpoint_goal(0, 0, 0).
       ?victim_in_rescue(N, GX, GY);
       .abolish(victim_position(N, _, _));
       .print("DETECTED VICTIM");
-      +victim_position(N, GX, GY)[ap(5000),lu(HH,MM,SS,MS)].
+      +victim_position(N, GX, GY)[ap(_),lu(HH,MM,SS,MS)].
 
 +!start_negotiation: .desire(negotiate) | .desire(rescueVictim)
 	<- 	.suspend;
@@ -84,7 +84,7 @@ setpoint_goal(0, 0, 0).
       .print("Not selected to rescue victim ", N).
 
 +!rescueVictim
-	<- 	.wait(1000);
+	<- 	.wait(100);
       ?victim_in_rescue(N, GX, GY);
       !defineGoalLocal([[GX, GY,_]]);
       !drop_buoy(N);
@@ -118,7 +118,7 @@ setpoint_goal(0, 0, 0).
 
 +!defineGoalLocal([]).
 
-+!drop_buoy(N): victim_position(N, _, _)[ap(5000)]
++!drop_buoy(N): victim_position(N, NX, NY)[ap(3000)]
   <-  ?flight_altitude(Z);
       !getGazeboPos;
       ?gazebo_pos(GX, GY, GZ);
@@ -131,10 +131,10 @@ setpoint_goal(0, 0, 0).
   <-  .print("Victim ", N, " not found");
       .broadcast(tell, victim_drowned(N)).
 
-+?victim_position(N, _, _)[ap(T)]
++?victim_position(N, NX, NY)[ap]
   <-  .print("Active perception for victim ", N," !!!!!!!!!!!!!!!!!!!!!!!!!!!");
       camera_switch(True);
-      .wait(1000);
+      .wait(100);
       camera_switch(False);
       .
 
@@ -149,7 +149,7 @@ setpoint_goal(0, 0, 0).
       -+setpoint_goal(0,0,0);
       .wait(local_pos(X,Y,Z,_,_,_,_) & X <=0.5 & Y <=0.5 & Z <= 0.2);
       .print("Landed! beginning charging and buoy replacement!");
-      .wait(1000).
+      .wait(100).
 
 +!getGazeboPos
   <-  ?model_states(Models, Poses);
