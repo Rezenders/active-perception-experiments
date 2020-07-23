@@ -87,16 +87,7 @@
     </physics>
 
     <include>
-      <name>victim_randy</name>
-      <pose>7 10 0.1 -1.57 0 0</pose>
-      <uri>model://rescue_randy</uri>
-      <plugin name="victim" filename="libvictim.so">
-        <drowningTime>85000</drowningTime>
-      </plugin>
-    </include>
-
-    <include>
-      <name>victim_scrubs</name>
+      <name>victim1</name>
       <pose>-7 5.5 0.1 -1.57 0 0</pose>
       <uri>model://OpScrubs</uri>
       <plugin name="victim" filename="libvictim.so">
@@ -105,38 +96,47 @@
     </include>
 
     <include>
-      <name>victim_survivorf</name>
+      <name>victim2</name>
       <pose>0 6.5 0 0 0 0</pose>
       <uri>model://Survivor Female</uri>
       <plugin name="victim" filename="libvictim.so">
-        <drowningTime>40000</drowningTime>
+        <drowningTime>45000</drowningTime>
       </plugin>
     </include>
 
     <include>
-      <name>victim_person</name>
-      <pose>0 10.5 0.1 0 0 0</pose>
-      <uri>model://Survivor Male</uri>
+      <name>victim3</name>
+      <pose>10 6.5 0 0 0 0.97</pose>
+      <uri>model://Survivor Female</uri>
       <plugin name="victim" filename="libvictim.so">
-        <drowningTime>50000</drowningTime>
+        <drowningTime>48000</drowningTime>
+      </plugin>
+    </include>
+
+    <include>
+      <name>victim4</name>
+      <pose>-7 11.5 0.1 -1.57 0 -0.57</pose>
+      <uri>model://rescue_randy</uri>
+      <plugin name="victim" filename="libvictim.so">
+        <drowningTime>80000</drowningTime>
       </plugin>
     </include>
 
     <include>
       <name>victim5</name>
-      <pose>-7 11.5 0.1 -1.57 0 -0.57</pose>
-      <uri>model://rescue_randy</uri>
+      <pose>0 10.5 0.1 0 0 0</pose>
+      <uri>model://Survivor Male</uri>
       <plugin name="victim" filename="libvictim.so">
-        <drowningTime>100000</drowningTime>
+        <drowningTime>60000</drowningTime>
       </plugin>
     </include>
 
     <include>
       <name>victim6</name>
-      <pose>10 6.5 0 0 0 0.97</pose>
-      <uri>model://Survivor Female</uri>
+      <pose>7 10 0.1 -1.57 0 0</pose>
+      <uri>model://rescue_randy</uri>
       <plugin name="victim" filename="libvictim.so">
-        <drowningTime>50000</drowningTime>
+        <drowningTime>85000</drowningTime>
       </plugin>
     </include>
 
