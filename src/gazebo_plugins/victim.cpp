@@ -34,14 +34,14 @@ namespace gazebo{
       std::this_thread::sleep_for(
         std::chrono::milliseconds(this->drowning_time_));
 
-      // mtx.lock();
+      std::lock_guard<std::mutex> guard(mtx);
+      this->rosSub.shutdown();
       if(this->drowning){
         gazebo::transport::PublisherPtr request_pub = this->node->Advertise<msgs::Request>("~/request");
         msgs::Request *msg = msgs::CreateRequest("entity_delete", this->model->GetName());
         request_pub->Publish(*msg);
         delete msg;
       }
-      // mtx.unlock();
     }
 
     void QueueThread(){
@@ -55,11 +55,11 @@ namespace gazebo{
   public:
     VictimPlugin() : ModelPlugin(){}
     ~VictimPlugin(){
-      timer_thread_.join();
       rosQueue.clear();
       rosQueue.disable();
       rosNode->shutdown();
       rosQueueThread.join();
+      timer_thread_.join();
     }
 
     void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf){
@@ -99,9 +99,8 @@ namespace gazebo{
     }
 
     void OnRosMsg(const std_msgs::BoolConstPtr &_msg){
-      // mtx.lock();
+      std::lock_guard<std::mutex> guard(mtx);
       this->drowning = _msg->data;
-      // mtx.unlock();
     }
   };
   GZ_REGISTER_MODEL_PLUGIN(VictimPlugin)
