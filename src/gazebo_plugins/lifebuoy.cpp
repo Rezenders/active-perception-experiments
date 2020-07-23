@@ -31,6 +31,8 @@ namespace gazebo{
 
     std::unique_ptr<ros::NodeHandle> rosNode;
 
+    ros::Publisher victimPub;
+
     ros::Subscriber rosSub;
     ros::CallbackQueue rosQueue;
     std::thread rosQueueThread;
@@ -83,12 +85,12 @@ namespace gazebo{
           ignition::math::Pose3d buoyPose = model->WorldPose();
 
           double distance = euclideanDistance(victimPose, buoyPose);
-          if(distance < 2.5){
-            ros::Publisher victimPub;
-            victimPub = rosNode->advertise<std_msgs::Bool>("/victim/"+_msg->name.at(i), 1);
-
+          if(distance < 2.5 & ros::ok()){
             std_msgs::Bool pubMsg;
             pubMsg.data = false;
+
+
+            this->victimPub = rosNode->advertise<std_msgs::Bool>("/victim/"+_msg->name.at(i), 1);
             victimPub.publish(pubMsg);
 
             i = _msg->name.size();
