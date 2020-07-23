@@ -89,6 +89,7 @@ namespace gazebo{
           boost::bind(&VictimPlugin::OnRosMsg, this, _1),
           ros::VoidPtr(), &this->rosQueue);
 
+      so.transport_hints = ros::TransportHints().unreliable();
       this->rosSub = this->rosNode->subscribe(so);
 
       this->rosQueueThread =
