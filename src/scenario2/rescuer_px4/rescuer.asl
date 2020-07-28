@@ -19,15 +19,8 @@ setpoint_goal(0, 0, 0).
 +!setRTLAtlitude(A) <- !setRTLAtlitude(A).
 
 +victim_in_need(N, GX, GY)[lu(HH,MM,SS,MS)]
-	<-	+victim_position(N, GX, GY)[ap(_),lu(HH,MM,SS,MS)];
+	<-	+victim_position(N, GX, GY)[ap(100),lu(HH,MM,SS,MS)];
       !start_negotiation.
-
-+victim(ID, _, _)
-  <-  .time(HH,MM,SS,MS);
-      ?victim_in_rescue(N, GX, GY);
-      .abolish(victim_position(N, _, _));
-      .print("DETECTED VICTIM");
-      +victim_position(N, GX, GY)[ap(_),lu(HH,MM,SS,MS)].
 
 +!start_negotiation: .desire(negotiate) | .desire(rescueVictim)
 	<- 	.suspend;
@@ -84,7 +77,7 @@ setpoint_goal(0, 0, 0).
       .print("Not selected to rescue victim ", N).
 
 +!rescueVictim
-	<- 	.wait(100);
+	<- 	.wait(1000);
       ?victim_in_rescue(N, GX, GY);
       !defineGoalLocal([[GX, GY,_]]);
       !drop_buoy(N);
@@ -118,7 +111,7 @@ setpoint_goal(0, 0, 0).
 
 +!defineGoalLocal([]).
 
-+!drop_buoy(N): victim_position(N, NX, NY)[ap(5000)]
++!drop_buoy(N)
   <-  ?flight_altitude(Z);
       !getGazeboPos;
       ?gazebo_pos(GX, GY, GZ);
@@ -126,17 +119,6 @@ setpoint_goal(0, 0, 0).
       .print("Droping buoy to victim ", N);
       .broadcast(tell, victim_rescued(N));
       !returnHome.
-
-+!drop_buoy(N)
-  <-  .print("Victim ", N, " not found");
-      .broadcast(tell, victim_drowned(N)).
-
-+?victim_position(N, NX, NY)[ap]
-  <-  .print("Active perception for victim ", N," !!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      camera_switch(True);
-      .wait(100);
-      camera_switch(False);
-      .
 
 +!resume_negotiation: .intend(start_negotiation)
   <-  .drop_intention(publishSetPoint);
@@ -149,7 +131,7 @@ setpoint_goal(0, 0, 0).
       -+setpoint_goal(0,0,0);
       .wait(local_pos(X,Y,Z,_,_,_,_) & X <=0.5 & Y <=0.5 & Z <= 0.2);
       .print("Landed! beginning charging and buoy replacement!");
-      .wait(100).
+      .wait(1000).
 
 +!getGazeboPos
   <-  ?model_states(Models, Poses);
@@ -175,5 +157,3 @@ setpoint_goal(0, 0, 0).
 
 +!mark_as_rescued(N, Lat, Long)
 	<- .abolish(victim_in_need(N,Lat,Long)).
-
-{apply_ap}

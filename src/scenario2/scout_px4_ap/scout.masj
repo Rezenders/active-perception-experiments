@@ -1,0 +1,7 @@
+MAS scout {
+
+    infrastructure: Centralised
+
+    agents: scout scout.asl agentArchClass jasonros.RosArch;
+    directives: apply_ap = active_perception.Directive3;
+}

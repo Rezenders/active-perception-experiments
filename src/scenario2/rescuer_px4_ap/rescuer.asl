@@ -5,6 +5,7 @@ setpoint_goal(0, 0, 0).
 /* Initial goals */
 !getGazeboOffset.
 !setRTLAtlitude(3.0).
+!inRange.
 
 /* Plans */
 +!setMaxSpeed(S) : state(_,"True",_)
@@ -18,16 +19,13 @@ setpoint_goal(0, 0, 0).
 
 +!setRTLAtlitude(A) <- !setRTLAtlitude(A).
 
-+victim_in_need(N, GX, GY)[lu(HH,MM,SS,MS)]
-	<-	+victim_position(N, GX, GY)[ap(_),lu(HH,MM,SS,MS)];
-      !start_negotiation.
++!inRange
+	<-	.time(HH,MM,SS,MS);
+			+range[ap(_),lu(HH,MM,SS,MS)].
 
-+victim(ID, _, _)
-  <-  .time(HH,MM,SS,MS);
-      ?victim_in_rescue(N, GX, GY);
-      .abolish(victim_position(N, _, _));
-      .print("DETECTED VICTIM");
-      +victim_position(N, GX, GY)[ap(_),lu(HH,MM,SS,MS)].
++victim_in_need(N, GX, GY)[lu(HH,MM,SS,MS)]
+	<-	+victim_position(N, GX, GY)[ap(100),lu(HH,MM,SS,MS)];
+      !start_negotiation.
 
 +!start_negotiation: .desire(negotiate) | .desire(rescueVictim)
 	<- 	.suspend;
@@ -56,7 +54,8 @@ setpoint_goal(0, 0, 0).
 			!broadcastProposal(10, Me, N, R*100).
 
 +!broadcastProposal(I, Me, N, R) : I>0
-  <-  .broadcast(tell, propose(Me, N, R));
+  <-  !broadcast(tell, propose(Me, N, R));
+      // .broadcast(tell, propose(Me, N, R));
       .wait(200);
       !broadcastProposal(I-1, Me, N, R).
 
@@ -73,7 +72,8 @@ setpoint_goal(0, 0, 0).
 	<-	.print("I am responsible for rescuing victim ", N);
 			?victim_in_need(N, GX, GY);
       .abolish(victim_in_need(N, _, _));
-      .broadcast(achieve, mark_as_rescued(N, Lat, Long));
+      // .broadcast(achieve, mark_as_rescued(N, Lat, Long));
+      !broadcast(achieve, mark_as_rescued(N, Lat, Long));
       +victim_in_rescue(N, GX, GY);
       !!publishSetPoint;
 			!!rescueVictim.
@@ -84,7 +84,7 @@ setpoint_goal(0, 0, 0).
       .print("Not selected to rescue victim ", N).
 
 +!rescueVictim
-	<- 	.wait(100);
+	<- 	.wait(1000);
       ?victim_in_rescue(N, GX, GY);
       !defineGoalLocal([[GX, GY,_]]);
       !drop_buoy(N);
@@ -118,25 +118,15 @@ setpoint_goal(0, 0, 0).
 
 +!defineGoalLocal([]).
 
-+!drop_buoy(N): victim_position(N, NX, NY)[ap(5000)]
++!drop_buoy(N)
   <-  ?flight_altitude(Z);
       !getGazeboPos;
       ?gazebo_pos(GX, GY, GZ);
       drop_buoy(GX, GY, GZ-0.25);
       .print("Droping buoy to victim ", N);
-      .broadcast(tell, victim_rescued(N));
+      // .broadcast(tell, victim_rescued(N));
+      !broadcast(tell, victim_rescued(N));
       !returnHome.
-
-+!drop_buoy(N)
-  <-  .print("Victim ", N, " not found");
-      .broadcast(tell, victim_drowned(N)).
-
-+?victim_position(N, NX, NY)[ap]
-  <-  .print("Active perception for victim ", N," !!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      camera_switch(True);
-      .wait(100);
-      camera_switch(False);
-      .
 
 +!resume_negotiation: .intend(start_negotiation)
   <-  .drop_intention(publishSetPoint);
@@ -149,7 +139,7 @@ setpoint_goal(0, 0, 0).
       -+setpoint_goal(0,0,0);
       .wait(local_pos(X,Y,Z,_,_,_,_) & X <=0.5 & Y <=0.5 & Z <= 0.2);
       .print("Landed! beginning charging and buoy replacement!");
-      .wait(100).
+      .wait(1000).
 
 +!getGazeboPos
   <-  ?model_states(Models, Poses);
@@ -175,5 +165,26 @@ setpoint_goal(0, 0, 0).
 
 +!mark_as_rescued(N, Lat, Long)
 	<- .abolish(victim_in_need(N,Lat,Long)).
+
++!broadcast(Itl, Data) : range[ap(5000)]
+	<- .broadcast(Itl, Data).
+
++!broadcast(Itl, Data).
+
++?range[ap]
+	<-	.print("Flying to comm range!");
+			.suspend(defineGoalLocal(_));
+			?flight_altitude(Z);
+			?old_setpoint_goal(OX, OY, OZ);
+			?setpoint_goal(LX, LY, LZ);
+			X=0;Y=4;
+			-+setpoint_goal(X, Y, Z);
+			.wait(local_pos(X2,Y2,Z2,_,_,_,_) & math.abs(X2 -(X)) <=0.7 & math.abs(Y2 -(Y)) <=0.7 & math.abs(Z2 -(Z)) <=0.7);
+			.time(HH,MM,SS,MS);
+			+range[ap(_),lu(HH,MM,SS,MS)];
+			// !!returntToPath([OX,OY,OZ],[LX,LY,LZ]).
+      .resume(defineGoalLocal(_));
+      .
+
 
 {apply_ap}

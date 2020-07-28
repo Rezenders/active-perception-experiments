@@ -1,0 +1,7 @@
+MAS rescuer1 {
+
+    infrastructure: Centralised
+
+    agents: rescuer1 rescuer.asl agentArchClass jasonros.RosArch;
+    directives: apply_ap = active_perception.Directive3;
+}
