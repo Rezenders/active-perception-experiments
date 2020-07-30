@@ -55,7 +55,6 @@ setpoint_goal(0, 0, 0).
 
 +!broadcastProposal(I, Me, N, R) : I>0
   <-  !broadcast(tell, propose(Me, N, R));
-      // .broadcast(tell, propose(Me, N, R));
       .wait(200);
       !broadcastProposal(I-1, Me, N, R).
 
@@ -72,7 +71,6 @@ setpoint_goal(0, 0, 0).
 	<-	.print("I am responsible for rescuing victim ", N);
 			?victim_in_need(N, GX, GY);
       .abolish(victim_in_need(N, _, _));
-      // .broadcast(achieve, mark_as_rescued(N, Lat, Long));
       !broadcast(achieve, mark_as_rescued(N, Lat, Long));
       +victim_in_rescue(N, GX, GY);
       !!publishSetPoint;
@@ -97,15 +95,13 @@ setpoint_goal(0, 0, 0).
 			.wait(200);
 			!publishSetPoint.
 
-+!publishSetPoint : not state("OFFBOARD",_,"True")
++!publishSetPoint
 	<-	arm_motors(True);
 			set_mode("OFFBOARD");
 			?setpoint_goal(X,Y,Z);
 			setpoint_local(X,Y,Z);
 			.wait(200);
 			!publishSetPoint.
-
-+!publishSetPoint <- !publishSetPoint.
 
 +!defineGoalLocal([H|T])
 	<- 	H = [X, Y, _];
@@ -124,22 +120,23 @@ setpoint_goal(0, 0, 0).
       ?gazebo_pos(GX, GY, GZ);
       drop_buoy(GX, GY, GZ-0.25);
       .print("Droping buoy to victim ", N);
-      // .broadcast(tell, victim_rescued(N));
+      .drop_intention(publishSetPoint);
+      -+setpoint_goal(0,0,0);
       !broadcast(tell, victim_rescued(N));
       !returnHome.
 
 +!resume_negotiation: .intend(start_negotiation)
   <-  .drop_intention(publishSetPoint);
+      -+setpoint_goal(0,0,0);
       .resume(start_negotiation).
 
-+!resume_negotiation <- .drop_intention(publishSetPoint).
++!resume_negotiation <- .drop_intention(publishSetPoint); -+setpoint_goal(0,0,0);.
 
 +!returnHome
-  <-  .drop_intention(publishSetPoint);
-      -+setpoint_goal(0,0,0);
-      .wait(local_pos(X,Y,Z,_,_,_,_) & X <=0.5 & Y <=0.5 & Z <= 0.2);
+  <-  .wait(local_pos(X,Y,Z,_,_,_,_) & X <=0.5 & Y <=0.5 & Z <= 0.2);
       .print("Landed! beginning charging and buoy replacement!");
-      .wait(1000).
+      .wait(2000);
+      .print("Completed recharging!!!!!!!!!!!!!").
 
 +!getGazeboPos
   <-  ?model_states(Models, Poses);
@@ -172,19 +169,33 @@ setpoint_goal(0, 0, 0).
 +!broadcast(Itl, Data).
 
 +?range[ap]
-	<-	.print("Flying to comm range!");
-			.suspend(defineGoalLocal(_));
-			?flight_altitude(Z);
-			?old_setpoint_goal(OX, OY, OZ);
-			?setpoint_goal(LX, LY, LZ);
-			X=0;Y=4;
-			-+setpoint_goal(X, Y, Z);
-			.wait(local_pos(X2,Y2,Z2,_,_,_,_) & math.abs(X2 -(X)) <=0.7 & math.abs(Y2 -(Y)) <=0.7 & math.abs(Z2 -(Z)) <=0.7);
-			.time(HH,MM,SS,MS);
-			+range[ap(_),lu(HH,MM,SS,MS)];
-			// !!returntToPath([OX,OY,OZ],[LX,LY,LZ]).
-      .resume(defineGoalLocal(_));
-      .
+  <-  .suspend(publishSetPoint);
+      !flyToCommSpot(0, 6);
+      .time(HH,MM,SS,MS);
+  		+range[ap(_),lu(HH,MM,SS,MS)];
+      .resume(publishSetPoint).
 
+
++!flyToCommSpot(X,Y): local_pos(LX, LY, _, _, _, _, _) & math.abs(X-LX) <=0.7 & math.abs(Y-LY) <=0.7
+  <- .print("Arrived").
+
++!flyToCommSpot(X,Y): .intend(returnHome)
+  <-  .print("Waiting to finish recharging");
+      .wait(200);
+      !flyToCommSpot(X,Y).
+
++!flyToCommSpot(X,Y): state("OFFBOARD",_,"True") & not .intend(returnHome)
+  <-  ?flight_altitude(Z);
+      setpoint_local(X,Y,Z);
+      .wait(200);
+      !flyToCommSpot(X,Y).
+
++!flyToCommSpot(X,Y): not state("OFFBOARD",_,"True") & not .intend(returnHome)
+  <-  arm_motors(True);
+			set_mode("OFFBOARD");
+      ?flight_altitude(Z);
+      setpoint_local(X,Y,Z);
+      .wait(200);
+      !flyToCommSpot(X,Y).
 
 {apply_ap}

@@ -1,5 +1,5 @@
 [DEFAULT]
-rate = 20
+rate = 30
 
 [state]
 name = mavros/state

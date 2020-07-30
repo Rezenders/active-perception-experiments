@@ -81,7 +81,7 @@
           args="$(arg agent_path) $(arg scout) scout.asl" output="screen">
         </node>
 
-        <node name="comm" pkg="jason_ros_comm" type="comm_udp_gz_dist.py" output="screen">
+        <node name="comm" pkg="jason_ros_comm" type="comm_udp_gz_dist.py">
           <rosparam command="load" file="$(find active-perception-experiments)/params/local_ips.yaml" />
           <param name="comm_range" value="10"/>
         </node>
@@ -128,7 +128,7 @@
           args="$(arg agent_path) $(arg rescuer1) rescuer.asl" output="screen">
         </node>
 
-        <node name="comm" pkg="jason_ros_comm" type="comm_udp_gz_dist.py" output="screen">
+        <node name="comm" pkg="jason_ros_comm" type="comm_udp_gz_dist.py">
           <rosparam command="load" file="$(find active-perception-experiments)/params/local_ips.yaml" />
           <param name="comm_range" value="10"/>
         </node>
@@ -175,7 +175,7 @@
           args="$(arg agent_path) $(arg rescuer2) rescuer.asl" output="screen">
         </node>
 
-        <node name="comm" pkg="jason_ros_comm" type="comm_udp_gz_dist.py" output="screen">
+        <node name="comm" pkg="jason_ros_comm" type="comm_udp_gz_dist.py">
           <rosparam command="load" file="$(find active-perception-experiments)/params/local_ips.yaml" />
           <param name="comm_range" value="10"/>
         </node>

@@ -38,8 +38,6 @@ setpoint_goal(0,0,0).
 +!defineGoal([H|T])
 	<- 	H = [X, Y, _];
 			?flight_altitude(Z);
-			?setpoint_goal(LX,LY,LZ);
-			-+old_setpoint_goal(LX,LY,LZ);
 			-+setpoint_goal(X,Y,Z);
 			.wait(local_pos(X2,Y2,Z2,_,_,_,_) & math.abs(X2 -(X)) <=0.7 & math.abs(Y2 -(Y)) <=0.7 & math.abs(Z2 -(Z)) <=0.7);
 			!defineGoal(T).
@@ -87,22 +85,23 @@ setpoint_goal(0,0,0).
 +!informVictim([]).
 
 +!broadcast(Itl, Data) : range[ap(1000)]
-	<- .broadcast(Itl, Data).
+	<- .broadcast(Itl, Data);
+			.print("Sending MSG!!!!!!!").
 
 +!broadcast(Itl, Data).
 
 +?range[ap]
 	<-	.print("Flying to comm range!");
 			.suspend(defineGoal(_));
-			?flight_altitude(Z);
-			?old_setpoint_goal(OX, OY, OZ);
-			?setpoint_goal(LX, LY, LZ);
+			?local_pos(LX, LY, LZ, _, _, _, _);
+			?setpoint_goal(NX, NY, NZ);
 			X=0;Y=4;
+			?flight_altitude(Z);
 			-+setpoint_goal(X, Y, Z);
 			.wait(local_pos(X2,Y2,Z2,_,_,_,_) & math.abs(X2 -(X)) <=0.7 & math.abs(Y2 -(Y)) <=0.7 & math.abs(Z2 -(Z)) <=0.7);
 			.time(HH,MM,SS,MS);
 			+range[ap(_),lu(HH,MM,SS,MS)];
-			!!returntToPath([OX,OY,OZ],[LX,LY,LZ]).
+			!!returntToPath([LX,LY,LZ],[NX,NY,NZ]).
 
 +!returntToPath(H,T)
 	<-	H = [X1, Y1, Z1];
