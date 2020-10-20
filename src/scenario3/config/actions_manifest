@@ -1,0 +1,72 @@
+[set_mode]
+method = service
+name = mavros/set_mode
+msg_type = SetMode
+dependencies = mavros_msgs.srv
+params_name = custom_mode
+
+[arm_motors]
+method = service
+name = mavros/cmd/arming
+msg_type = CommandBool
+dependencies = mavros_msgs.srv
+params_name = value
+params_type = bool
+
+[takeoff]
+method = service
+name = mavros/cmd/takeoff
+msg_type = CommandTOL
+dependencies = mavros_msgs.srv
+params_name = altitude
+params_type = float
+
+[setpoint_global]
+method = topic
+name = mavros/setpoint_position/global
+msg_type = GeoPoseStamped
+dependencies = geographic_msgs.msg
+params_name = pose.position.latitude, pose.position.longitude, pose.position.altitude
+params_type = float, float, float
+
+[setpoint_local]
+method = topic
+name = mavros/setpoint_position/local
+msg_type = geometry_msgs/PoseStamped
+params_name = pose.position.x, pose.position.y, pose.position.z
+params_type = float, float, float
+
+[land]
+method = service
+name = mavros/cmd/land
+msg_type = CommandTOL
+dependencies = mavros_msgs.srv
+
+[plan_path]
+method = topic
+name = plan_path/goal
+msg_type = boustrophedon_msgs/PlanMowingPathActionGoal
+params_name = goal.robot_position.pose.position.x, goal.robot_position.pose.position.y, goal.robot_position.pose.position.z, goal.robot_position.pose.orientation.x, goal.robot_position.pose.orientation.y, goal.robot_position.pose.orientation.z, goal.robot_position.pose.orientation.w , goal.property.polygon.points
+params_type = float, float, float, float, float, float, float, geometry_msgs/Point32[](x,y,z)
+latch = True
+
+[set_fcu_param]
+method = service
+name = mavros/param/set
+msg_type = mavros_msgs/ParamSet
+params_name = param_id, value.integer, value.real
+params_type = str, int, float
+
+[drop_buoy]
+method = topic
+name = /rescue_world/drop_buoy
+msg_type = geometry_msgs/Pose
+params_name = position.x, position.y, position.z
+params_type = float, float, float
+
+[camera_switch]
+method = service
+name = mock_camera/switch
+msg_type = std_srvs/SetBool
+params_name = data
+params_type = bool

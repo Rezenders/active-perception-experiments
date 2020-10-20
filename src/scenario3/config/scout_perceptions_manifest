@@ -1,0 +1,33 @@
+[DEFAULT]
+rate = 30
+
+[state]
+name = mavros/state
+msg_type = State
+dependencies = mavros_msgs.msg
+args = mode, connected, armed
+buf = update
+
+[local_pos]
+name = mavros/local_position/pose
+msg_type = geometry_msgs/PoseStamped
+args = pose.position.x, pose.position.y, pose.position.z, pose.orientation.x,  pose.orientation.y,  pose.orientation.z,  pose.orientation.w
+buf = update
+
+[plan_path_result]
+name = plan_path/result
+msg_type = boustrophedon_msgs/PlanMowingPathActionResult
+args = result.plan.points[](point.x, point.y, point.z)
+buf = update
+
+[victim]
+name = mock_camera/victim_detection
+msg_type = geometry_msgs/PoseStamped
+args = header.seq, pose.position.x, pose.position.y
+buf = add
+
+# [model_states]
+# name = /gazebo/model_states
+# msg_type = gazebo_msgs/ModelStates
+# args = name, pose[](position.x, position.y, position.z)
+# buf = update
