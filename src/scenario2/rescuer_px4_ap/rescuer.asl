@@ -135,7 +135,7 @@ setpoint_goal(0, 0, 0).
 +!returnHome
   <-  .wait(local_pos(X,Y,Z,_,_,_,_) & X <=0.5 & Y <=0.5 & Z <= 0.2);
       .print("Landed! beginning charging and buoy replacement!");
-      .wait(2000);
+      .wait(1000);
       .print("Completed recharging!!!!!!!!!!!!!").
 
 +!getGazeboPos
@@ -163,7 +163,7 @@ setpoint_goal(0, 0, 0).
 +!mark_as_rescued(N, Lat, Long)
 	<- .abolish(victim_in_need(N,Lat,Long)).
 
-+!broadcast(Itl, Data) : range[ap(5000)]
++!broadcast(Itl, Data) : range[ap(10000)]
 	<- .broadcast(Itl, Data).
 
 +!broadcast(Itl, Data).

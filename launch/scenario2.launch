@@ -82,7 +82,7 @@
 
         <node name="comm" pkg="jason_ros_comm" type="comm_udp_gz_dist.py" output="screen">
           <rosparam command="load" file="$(find active-perception-experiments)/params/local_ips.yaml" />
-          <param name="comm_range" value="10"/>
+          <param name="comm_range" value="15"/>
         </node>
 
         <node name="mock_camera" pkg="active-perception-experiments" type="mock_camera.py" output="screen">
@@ -129,7 +129,7 @@
 
         <node name="comm" pkg="jason_ros_comm" type="comm_udp_gz_dist.py" output="screen">
           <rosparam command="load" file="$(find active-perception-experiments)/params/local_ips.yaml" />
-          <param name="comm_range" value="10"/>
+          <param name="comm_range" value="15"/>
         </node>
 
         <node name="mock_camera" pkg="active-perception-experiments" type="mock_camera.py" output="screen">
@@ -176,7 +176,7 @@
 
         <node name="comm" pkg="jason_ros_comm" type="comm_udp_gz_dist.py" output="screen">
           <rosparam command="load" file="$(find active-perception-experiments)/params/local_ips.yaml" />
-          <param name="comm_range" value="10"/>
+          <param name="comm_range" value="15"/>
         </node>
 
         <node name="mock_camera" pkg="active-perception-experiments" type="mock_camera.py" output="screen">

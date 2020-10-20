@@ -62,7 +62,6 @@
             <param name="enable_stripe_angle_orientation" value="true" />
             <param name="travel_along_boundary" value="false" />
             <param name="allow_points_outside_boundary" value="true" />
-            <!-- Note: if enabling half-y turns, must have an outline_layer_count >= 1 -->
             <param name="enable_half_y_turns" value="false" />
             <param name="points_per_turn" value="15" />
             <param name="turn_start_offset" value="0.5" />
@@ -95,8 +94,8 @@
         <arg name="ID" value="1"/>
         <arg name="fcu_url" default="udp://:14541@localhost:14581"/>
         <include file="$(find active-perception-experiments)/launch/single_vehicle_spawn.launch">
-            <arg name="x" value="2.5"/>
-            <arg name="y" value="-5"/>
+            <arg name="x" value="3.0"/>
+            <arg name="y" value="-2.5"/>
             <arg name="z" value="0"/>
             <arg name="R" value="0"/>
             <arg name="P" value="0"/>
@@ -141,8 +140,8 @@
         <arg name="ID" value="2"/>
         <arg name="fcu_url" default="udp://:14542@localhost:14582"/>
         <include file="$(find active-perception-experiments)/launch/single_vehicle_spawn.launch">
-            <arg name="x" value="-2.5"/>
-            <arg name="y" value="-5"/>
+            <arg name="x" value="-3.0"/>
+            <arg name="y" value="-2.5"/>
             <arg name="z" value="0"/>
             <arg name="R" value="0"/>
             <arg name="P" value="0"/>
