@@ -88,3 +88,35 @@ $ sudo docker run -it --rm --net ros_net  --name mavros --env ROS_HOSTNAME=mavro
 ```
 $ gradle
 ```
+
+## Reference
+If you find this repository usefull and use it in your project, please consider citing it:
+
+```
+@inproceedings{silva2021active,
+  title={Active Perception within BDI Agents Reasoning Cycle},
+  author={Silva, Gustavo R and H{\"u}bner, Jomi F and Becker, Leandro B},
+  booktitle={Proceedings of the 20th International Conference on Autonomous Agents and MultiAgent Systems},
+  pages={1218--1225},
+  year={2021}
+}
+```
+
+[Paper link](http://www.ifaamas.org/Proceedings/aamas2021/pdfs/p1218.pdf)
+
+And
+
+```
+@article{silva2020embedded,
+  title={Embedded Architecture Composed of Cognitive Agents and ROS for Programming Intelligent Robots},
+  author={Silva, Gustavo R and Becker, Leandro B and H{\"u}bner, Jomi F},
+  journal={IFAC-PapersOnLine},
+  volume={53},
+  number={2},
+  pages={10000--10005},
+  year={2020},
+  publisher={Elsevier}
+}
+```
+
+[Paper link](https://www.sciencedirect.com/science/article/pii/S2405896320334819)
